@@ -11,4 +11,6 @@ object Settings {
   val envGrokSettings: Seq[Def.Setting[_]] = seqBaseProjectTemplate(envGrokVersion)
   val randomnessSettings: Seq[Def.Setting[_]] = seqBaseProjectTemplate(randomnessVersion)
 
+  val terminalClientSettings: Seq[Def.Setting[_]] = seqBaseProjectTemplate(terminalClientVersion)
+
 }

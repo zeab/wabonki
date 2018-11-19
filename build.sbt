@@ -12,3 +12,6 @@ lazy val envgrok = (project in file(envGrokKey))
 lazy val randomness = (project in file(randomnessKey))
   .settings(randomnessSettings: _*)
 
+lazy val terminalclient = (project in file(terminalClientKey))
+  .settings(terminalClientSettings: _*)
+  .dependsOn(seed)
