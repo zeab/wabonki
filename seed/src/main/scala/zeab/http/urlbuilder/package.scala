@@ -1,6 +1,6 @@
 package zeab.http
 
-package object urlstringbuilder {
+package object urlbuilder {
 
   /** Format the override of the toString for just when you just have the host */
   private def hostFormat(schema: String, host: String): String = s"$schema://$host"
@@ -11,15 +11,15 @@ package object urlstringbuilder {
   /** Format the override of the toString for just when you have everything */
   private def hostParametersFormat(hostParameters: List[String]): String = hostParameters.mkString("/", "/", "")
 
-  sealed trait UrlStringBuilder
+  sealed trait UrlBuilder
 
-  /** */
-  case class Schema(schema: String) extends UrlStringBuilder {
+  /** All the scheme dsl options*/
+  case class Schema(schema: String) extends UrlBuilder {
     def host(host: String): Host = Host(schema, host)
   }
 
-  /** */
-  case class Host(schema: String, host: String) extends UrlStringBuilder {
+  /** All the host dsl options*/
+  case class Host(schema: String, host: String) extends UrlBuilder {
     override def toString: String = hostFormat(schema, host)
 
     def port(port: String): Port = Port(schema, host, Some(port))
@@ -29,8 +29,8 @@ package object urlstringbuilder {
     def hostParameter(value: String): HostParameter = HostParameter(schema, host, None, List(value))
   }
 
-  /** */
-  case class Port(schema: String, host: String, port: Option[String]) extends UrlStringBuilder {
+  /** All the port dsl options*/
+  case class Port(schema: String, host: String, port: Option[String]) extends UrlBuilder {
     override def toString: String = s"${hostFormat(schema, host)}${portFormat(port)}"
 
     def hostParameter(hostParameter: List[String]): HostParameter = HostParameter(schema, host, port, hostParameter)
@@ -38,8 +38,8 @@ package object urlstringbuilder {
     def hostParameter(value: String): HostParameter = HostParameter(schema, host, port, List(value))
   }
 
-  /** */
-  case class HostParameter(schema: String, host: String, port: Option[String], hostParameter: List[String]) extends UrlStringBuilder {
+  /** All the host parameters dsl options*/
+  case class HostParameter(schema: String, host: String, port: Option[String], hostParameter: List[String]) extends UrlBuilder {
     override def toString: String = s"${hostFormat(schema, host)}${portFormat(port)}${hostParametersFormat(hostParameter)}"
 
     def hostParameter(value: String): HostParameter = copy(schema, host, port, hostParameter ++ List(value))
@@ -49,8 +49,8 @@ package object urlstringbuilder {
     def queryParameter(key: String, value: String): QueryParameter = QueryParameter(schema, host, port, hostParameter, Map(key -> value))
   }
 
-  /** */
-  case class QueryParameter(schema: String, host: String, port: Option[String], hostParameter: List[String], queryParameter: Map[String, String]) extends UrlStringBuilder {
+  /** All the query dsl options*/
+  case class QueryParameter(schema: String, host: String, port: Option[String], hostParameter: List[String], queryParameter: Map[String, String]) extends UrlBuilder {
     override def toString: String = {
       def buildQuery(queryParameters: Map[String, String]): String = {
         def worker(queryParameters: List[(String, String)], query: String = ""): String = {
@@ -72,7 +72,8 @@ package object urlstringbuilder {
     def queryParameter(key: String, value: String): QueryParameter = copy(schema, host, port, hostParameter, queryParameter ++ Map(key -> value))
   }
 
-  object UrlStringBuilder extends UrlStringBuilder {
+  /** Start the schema building*/
+  object UrlBuilder extends UrlBuilder {
     def schema(schema: String): Schema = Schema(schema)
   }
 
