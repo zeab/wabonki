@@ -42,17 +42,20 @@ object Dependencies {
     val jodaTime                    = "joda-time" % "joda-time" % V.jodaTime
   }
 
-  val quireDependencies: Seq[ModuleID] = Seq(
-    D.akkaStream,
-    D.akkaHttp,
-    D.akkaHttpCirce,
-    D.circeCore,
-    D.circeParser,
-    D.akkaSlf4j,
-    D.logback,
-    D.logbackJson,
-    D.scalaTest,
-    D.akkaTestKit
+  val seedDependencies: Seq[ModuleID] = Seq(
+    D.scalaTest
+  )
+
+  val envGrokDependencies: Seq[ModuleID] = Seq(
+    D.scalaTest
+  )
+
+  val randomnessDependencies: Seq[ModuleID] = Seq(
+    D.scalaTest
+  )
+
+  val terminalClientDependencies: Seq[ModuleID] = Seq(
+    D.scalaTest
   )
 
 }
