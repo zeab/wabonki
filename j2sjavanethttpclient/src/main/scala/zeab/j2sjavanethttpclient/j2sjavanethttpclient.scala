@@ -3,6 +3,7 @@ package zeab
 //Imports
 import zeab.http.{HttpMethods, HttpSeed}
 import zeab.http.httpclient.{HttpClientError, HttpClientResponse}
+import zeab.http.HttpMetaData._
 //Java
 import java.net.{HttpURLConnection, URL}
 import java.nio.charset.CodingErrorAction
@@ -17,7 +18,7 @@ import scala.util.{Failure, Success, Try}
 
 package object j2sjavanethttpclient {
 
-  trait HttpClient {
+  trait HttpClient extends MapExtended{
 
     def invokeAsyncHttpClientResponse(
                                        httpSeed: HttpSeed,
@@ -34,17 +35,18 @@ package object j2sjavanethttpclient {
                                   metaData: Map[String, String] = Map.empty,
                                   isReturnBody: Boolean = true
                                 ): Either[HttpClientError, HttpClientResponse] = {
-      //TODO Hook these to read from the meta data and set if not found
-      val connectionTimeoutInMs: Int = 1000
-      val readTimeoutInMs: Int = 7000
-      val userAgent: String = "j2sjavanethttpclient"
+      val connectionTimeoutInMs: Int = checkMapForInt(setConnectTimeoutKey,metaData, 1000)
+      val readTimeoutInMs: Int = checkMapForInt(setReadTimeoutKey,metaData, 7000)
+      val userAgent: String = checkMapForString(setUserAgentKey, metaData, "j2sjavanethttpclient")
+      val closeConnectionHeader: Map[String, String] =
+        if(checkMapForBoolean(setCloseHttpHeader, metaData)) Map("Connection" -> "close")
+        else Map.empty
       //TODO Clean this up since idk if i really need it...
       val cleanUpHeaders: Map[String, String] = headers.filter(h => h._1.nonEmpty)
       //TODO Make the close connection configurable
-      val combinedHeaders: Map[String, String] = (authorization(url, method, body, cleanUpHeaders, metaData) ++ cleanUpHeaders ++ Map("Connection" -> "close")).filter(h => h._1.nonEmpty)
+      val combinedHeaders: Map[String, String] = (authorization(url, method, body, cleanUpHeaders, metaData) ++ cleanUpHeaders ++ closeConnectionHeader).filter(h => h._1.nonEmpty)
       val callCreateTimeMark: Long = System.currentTimeMillis()
       val timestamp: String = new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss.SSS").format(Calendar.getInstance().getTime)
-      //TODO Add some safety around this where it wont blow up if you don't have a legit url...
       Try(new URL(url).openConnection) match {
         case Success(openConn) =>
           openConn match {
