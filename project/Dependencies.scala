@@ -58,4 +58,8 @@ object Dependencies {
     D.scalaTest
   )
 
+  val j2sJavaNetHttpClientDependencies: Seq[ModuleID] = Seq(
+    D.scalaTest
+  )
+
 }

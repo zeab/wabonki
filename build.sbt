@@ -20,3 +20,8 @@ lazy val terminalclient = (project in file(terminalClientKey))
   .settings(terminalClientSettings: _*)
   .settings(libraryDependencies ++= terminalClientDependencies)
   .dependsOn(seed)
+
+lazy val j2sjavanethttpclient = (project in file(j2sJavaNetHttpClientKey))
+  .settings(j2sJavaNetHttpClientSettings: _*)
+  .settings(libraryDependencies ++= j2sJavaNetHttpClientDependencies)
+  .dependsOn(seed)

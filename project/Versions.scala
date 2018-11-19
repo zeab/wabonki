@@ -8,4 +8,6 @@ object Versions {
 
   val terminalClientVersion: String = "0.0.0"
 
+  val j2sJavaNetHttpClientVersion: String = "0.0.0"
+
 }

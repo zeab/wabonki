@@ -13,4 +13,6 @@ object Settings {
 
   val terminalClientSettings: Seq[Def.Setting[_]] = seqBaseProjectTemplate(terminalClientVersion)
 
+  val j2sJavaNetHttpClientSettings: Seq[Def.Setting[_]] = seqBaseProjectTemplate(j2sJavaNetHttpClientVersion)
+
 }
