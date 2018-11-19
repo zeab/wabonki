@@ -1,4 +1,4 @@
-package com.sbux.seedcore.http
+package zeab.http
 
 package object urlstringbuilder {
 
