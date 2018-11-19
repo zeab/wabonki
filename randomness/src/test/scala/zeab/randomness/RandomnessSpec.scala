@@ -40,6 +40,11 @@ class RandomnessSpec extends FunSpec {
       assert(randomness == "")
     }
 
+    it("random non zero is not zero and a number") {
+      val randomness: Int = Randomness.getRandomNonZero(3)
+      assert(randomness != 0)
+    }
+
   }
 
 }
