@@ -59,7 +59,7 @@ trait Randomness {
     val day = getRandomNonZero(31)
     //Months with 28
     if (month == 2) {
-      if (day > 28) getRandomMonthDay
+      if (day > 29) getRandomMonthDay
       else month.toString -> day.toString
     }
     //Months with 30 days
