@@ -4,9 +4,9 @@ import sbt._
 
 object Artifactory extends AutoPlugin {
 
-  val credsFile: String = "scpprd.credentials"
-  val res: String = "https://scpprd.jfrog.io/scpprd/sbux-local/"
-  val pubTo: String = "https://scpprd.jfrog.io/scpprd/sbux-local"
+  val credsFile: String = "a"
+  val res: String = "a"
+  val pubTo: String = "a"
 
   override lazy val projectSettings: Seq[Def.Setting[_]] = getArtifactoryCredentials
 

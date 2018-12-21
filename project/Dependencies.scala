@@ -14,7 +14,6 @@ object Dependencies {
     val logback                     = "1.2.3"
     val scalaTest                   = "3.0.5"
     val scalaXML                    = "1.0.6"
-    val jodaTime                    = "2.10"
   }
 
   //List of Dependencies
@@ -38,28 +37,21 @@ object Dependencies {
     val akkaTestKit                 = "com.typesafe.akka" %% "akka-testkit" % V.akka % Test
     //Scala XML
     val scalaXML                    = "org.scala-lang.modules" %% "scala-xml" % V.scalaXML
-    //Time
-    val jodaTime                    = "joda-time" % "joda-time" % V.jodaTime
   }
 
-  val seedDependencies: Seq[ModuleID] = Seq(
-    D.scalaTest
-  )
-
-  val envGrokDependencies: Seq[ModuleID] = Seq(
-    D.scalaTest
-  )
-
-  val randomnessDependencies: Seq[ModuleID] = Seq(
-    D.scalaTest
-  )
-
-  val terminalClientDependencies: Seq[ModuleID] = Seq(
-    D.scalaTest
-  )
-
-  val j2sJavaNetHttpClientDependencies: Seq[ModuleID] = Seq(
-    D.scalaTest
+  val wabonkiDependencies: Seq[ModuleID] = Seq(
+    D.akkaStream,
+    D.akkaHttp,
+    D.akkaHttpCirce,
+    D.akkaKafka,
+    D.circeCore,
+    D.circeParser,
+    D.akkaSlf4j,
+    D.logback,
+    D.logbackJson,
+    D.scalaTest,
+    D.akkaTestKit,
+    D.scalaXML
   )
 
 }

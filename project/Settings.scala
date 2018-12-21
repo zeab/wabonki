@@ -1,18 +1,12 @@
 
 //Imports
 import Common.seqBaseProjectTemplate
-import sbt.Def
 import Versions._
+import sbt.Def
 
 object Settings {
 
   //Settings
-  val seedSettings: Seq[Def.Setting[_]] = seqBaseProjectTemplate(seedVersion)
-  val envGrokSettings: Seq[Def.Setting[_]] = seqBaseProjectTemplate(envGrokVersion)
-  val randomnessSettings: Seq[Def.Setting[_]] = seqBaseProjectTemplate(randomnessVersion)
-
-  val terminalClientSettings: Seq[Def.Setting[_]] = seqBaseProjectTemplate(terminalClientVersion)
-
-  val j2sJavaNetHttpClientSettings: Seq[Def.Setting[_]] = seqBaseProjectTemplate(j2sJavaNetHttpClientVersion)
+  val wabonkiSettings: Seq[Def.Setting[_]] = seqBaseProjectTemplate(wabonkiVersion)
 
 }
