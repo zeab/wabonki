@@ -4,9 +4,9 @@ import sbt._
 
 object Artifactory extends AutoPlugin {
 
-  val credsFile: String = "a"
-  val res: String = "a"
-  val pubTo: String = "a"
+  val credsFile: String = "zeab.credentials"
+  val res: String = "http://192.168.1.144:8081/artifactory/ivy-dev-local/"
+  val pubTo: String = "http://192.168.1.144:8081/artifactory/ivy-dev-local"
 
   override lazy val projectSettings: Seq[Def.Setting[_]] = getArtifactoryCredentials
 

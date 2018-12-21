@@ -6,5 +6,5 @@ import java.util.Calendar
 
 case class BasicLogMessage(
                             msg: String,
-                            currentTimestamp: String = new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss.SSS").format(Calendar.getInstance().getTime)
+                            logTimestamp: String = new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss.SSS").format(Calendar.getInstance().getTime)
                           )

@@ -8,7 +8,7 @@ import sbt.Keys._
 object Common {
 
   //Common Settings
-  val useScalaVersion: String = "2.12.7"
+  val useScalaVersion: String = "2.12.6"
   val useOrganization: String = "zeab"
 
   //Get the current build time since epoch
