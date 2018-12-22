@@ -1,7 +1,13 @@
 package zeab.randomness
 
+import java.util.concurrent.ThreadLocalRandom
+
 trait Randomness {
 
+  def getRandomInt(max:Int, min:Int = 0): Int = ThreadLocalRandom.current.nextInt(min, max)
+  def getRandomDouble(max:Double, min:Double = 0): Double = ThreadLocalRandom.current.nextDouble(min, max)
+  def getRandomLong(max:Long, min:Long = 0): Long = ThreadLocalRandom.current.nextLong(min, max)
+  
   //Gets a random non-zero number
   def getRandomNonZero(max:Int): Int ={
     def worker(randomNumber: Int): Int = {
@@ -57,17 +63,15 @@ trait Randomness {
   def getRandomMonthDay: (String, String) = {
     val month = getRandomNonZero(12)
     val day = getRandomNonZero(31)
-    //Months with 28
-    if (month == 2) {
-      if (day > 29) getRandomMonthDay
-      else month.toString -> day.toString
+    month match {
+      case 2 =>
+        if (day > 29) getRandomMonthDay
+        else month.toString -> day.toString
+      case 4 | 6 | 9 | 11 =>
+        if (day > 30) getRandomMonthDay
+        else month.toString -> day.toString
+      case _ => month.toString -> day.toString
     }
-    //Months with 30 days
-    else if (month == 4 | month == 6 | month == 9 | month == 11) {
-      if (day > 30) getRandomMonthDay
-      else month.toString -> day.toString
-    }
-    else month.toString -> day.toString
   }
 
 }

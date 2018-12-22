@@ -4,7 +4,6 @@ package zeab
 import zeab.seed.terminal.{TerminalError, TerminalResponse}
 //Scala
 import scala.sys.process._
-import scala.sys.process.ProcessLogger
 import scala.util.{Failure, Success, Try}
 
 package object terminalclient {

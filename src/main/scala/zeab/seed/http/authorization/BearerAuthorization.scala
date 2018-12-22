@@ -1,7 +1,4 @@
 package zeab.seed.http.authorization
 
-object BearerAuthorization {
-
-
-
-}
+//TODO Fix this and do something with it
+object BearerAuthorization
