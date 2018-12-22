@@ -5,11 +5,10 @@ import zeab.akkatools.udp.client.UdpClientMessages.SendUdpDatagram
 //Java
 import java.net.InetSocketAddress
 //Akka
-import akka.actor.{Actor, ActorRef}
+import akka.actor.{Actor, ActorRef, ActorSystem}
 import akka.event.{Logging, LoggingAdapter}
 import akka.io.{IO, UdpConnected}
 import akka.util.ByteString
-import akka.actor.ActorSystem
 
 class UdpConnectedClientActor(host: String, port: String) extends Actor {
 

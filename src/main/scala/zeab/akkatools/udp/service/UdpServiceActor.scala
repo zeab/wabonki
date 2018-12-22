@@ -5,10 +5,9 @@ import zeab.akkatools.udp.service.UdpServiceMessages.StartUdpServer
 //Java
 import java.net.InetSocketAddress
 //Akka
-import akka.actor.{Actor, ActorRef}
+import akka.actor.{Actor, ActorRef, ActorSystem}
 import akka.event.{Logging, LoggingAdapter}
 import akka.io.{IO, Udp}
-import akka.actor.ActorSystem
 
 class UdpServiceActor extends Actor {
 
