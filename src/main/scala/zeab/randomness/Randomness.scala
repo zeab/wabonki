@@ -7,7 +7,7 @@ trait Randomness {
   def getRandomInt(max:Int, min:Int = 0): Int = ThreadLocalRandom.current.nextInt(min, max)
   def getRandomDouble(max:Double, min:Double = 0): Double = ThreadLocalRandom.current.nextDouble(min, max)
   def getRandomLong(max:Long, min:Long = 0): Long = ThreadLocalRandom.current.nextLong(min, max)
-  
+
   //Gets a random non-zero number
   def getRandomNonZero(max:Int): Int ={
     def worker(randomNumber: Int): Int = {
