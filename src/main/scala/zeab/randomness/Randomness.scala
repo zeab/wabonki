@@ -1,5 +1,6 @@
 package zeab.randomness
 
+//Imports
 import java.util.concurrent.ThreadLocalRandom
 
 trait Randomness {

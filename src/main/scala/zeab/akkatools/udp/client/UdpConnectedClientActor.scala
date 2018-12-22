@@ -9,46 +9,46 @@ import akka.actor.{Actor, ActorRef}
 import akka.event.{Logging, LoggingAdapter}
 import akka.io.{IO, UdpConnected}
 import akka.util.ByteString
+import akka.actor.ActorSystem
 
 class UdpConnectedClientActor(host: String, port: String) extends Actor {
 
-  val log: LoggingAdapter = Logging(context.system, this)
+  val actorLog: LoggingAdapter = Logging(context.system, this)
 
   val remote: InetSocketAddress = new InetSocketAddress(host, port.toInt)
 
-  import context.system
-
-  IO(UdpConnected) ! UdpConnected.Connect(self, remote)
+  implicit val actorSystem:ActorSystem = context.system
 
   def receive: Receive = {
-    case UdpConnected.Connected ⇒
-      log.debug(s"connecting udp")
+    case UdpConnected.Connected =>
+      actorLog.debug(s"connecting udp")
       context.become(ready(sender()))
   }
 
   def ready(connection: ActorRef): Receive = {
-    case UdpConnected.Received(data) ⇒
-      log.debug(s"received msg: $data")
+    case UdpConnected.Received(data) =>
+      actorLog.debug(s"received msg: $data")
     //What to do if I get a message from the connected service
-    case msg: SendUdpDatagram ⇒
-      log.debug(s"Sending Udp $host:$port msg: ${msg.msg}")
+    case msg: SendUdpDatagram =>
+      actorLog.debug(s"Sending Udp $host:$port msg: ${msg.msg}")
       connection ! UdpConnected.Send(ByteString(msg.msg))
-    case UdpConnected.Disconnect ⇒
-      log.debug(s"disconnecting udp")
+    case UdpConnected.Disconnect =>
+      actorLog.debug(s"disconnecting udp")
       connection ! UdpConnected.Disconnect
-    case UdpConnected.Disconnected ⇒
-      log.debug(s"disconnected udp")
+    case UdpConnected.Disconnected =>
+      actorLog.debug(s"disconnected udp")
       context.stop(self)
   }
 
   /** Log Name on Start */
   override def preStart: Unit = {
-    log.debug(s"Starting ${this.getClass.getName}")
+    IO(UdpConnected) ! UdpConnected.Connect(self, remote)
+    actorLog.debug(s"Starting ${this.getClass.getName}")
   }
 
   /** Log Name on Stop */
   override def postStop: Unit = {
-    log.debug(s"Stopping ${this.getClass.getName}")
+    actorLog.debug(s"Stopping ${this.getClass.getName}")
   }
 
 }

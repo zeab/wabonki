@@ -1,14 +1,14 @@
 package zeab
 
 //Imports
+import zeab.seed.http.HttpSeed
+import zeab.seed.http.HttpMethods.get
+import zeab.seed.http.httpclient.{HttpClientError, HttpClientResponse}
 //Java
 import java.net.{HttpURLConnection, URL}
 import java.nio.charset.CodingErrorAction
 import java.text.SimpleDateFormat
 import java.util.Calendar
-
-import zeab.seed.http.{HttpMetaData, HttpMethods, HttpSeed}
-import zeab.seed.http.httpclient.{HttpClientError, HttpClientResponse}
 //Scala
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
@@ -29,7 +29,7 @@ package object j2sjavanethttpclient {
 
     def invokeHttpClientResponse(
                                   url: String,
-                                  method: String = HttpMethods.get,
+                                  method: String = get,
                                   body: String = "",
                                   headers: Map[String, String] = Map.empty,
                                   metaData: Map[String, String] = Map.empty,
@@ -69,7 +69,7 @@ package object j2sjavanethttpclient {
               }
               //Body
               val requestBody: Option[HttpClientError] =
-                if (method != HttpMethods.get) {
+                if (method != get) {
                   openConn.setDoOutput(true)
                   val attachBody: Try[Unit] =
                     if (body == "") Try(openConn.setFixedLengthStreamingMode(0))
@@ -93,7 +93,7 @@ package object j2sjavanethttpclient {
                 case None =>
                   //TODO Figure out why i thought i needed flush in the first place
                   //openConn.getOutputStream.flush()
-                  if (method != HttpMethods.get) openConn.getOutputStream.close()
+                  if (method != get) openConn.getOutputStream.close()
                   //Open the connection <- basically not doing this makes gets take twice as long... go figure
                   Try(openConn.connect()) match {
                     case Success(_) =>

@@ -3,7 +3,7 @@ package zeab.akkatools.udp.client
 //Imports
 import java.net.InetSocketAddress
 
-import akka.actor.{Actor, ActorRef}
+import akka.actor.{Actor, ActorRef, ActorSystem}
 import akka.event.{Logging, LoggingAdapter}
 import akka.io.{IO, Udp}
 import akka.util.ByteString
@@ -13,7 +13,7 @@ class UdpUnconnectedClientActor extends Actor {
 
   val log: LoggingAdapter = Logging(context.system, this)
 
-  import context.system
+  implicit val actorSystem:ActorSystem = context.system
 
   IO(Udp) ! Udp.SimpleSender
 
