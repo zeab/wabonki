@@ -8,43 +8,45 @@ import java.net.InetSocketAddress
 import akka.actor.{Actor, ActorRef}
 import akka.event.{Logging, LoggingAdapter}
 import akka.io.{IO, Udp}
+import akka.actor.ActorSystem
 
 class UdpServiceActor extends Actor {
 
-  val log: LoggingAdapter = Logging(context.system, this)
+  val actorLog: LoggingAdapter = Logging(context.system, this)
+
+  implicit val actorSystem:ActorSystem = context.system
 
   def receive: Receive = disconnected
 
   def disconnected: Receive = {
     case m: StartUdpServer =>
-      import context.system
-      log.info(s"Binding Udp server to ${m.host}:${m.port}")
+      actorLog.info(s"Binding Udp server to ${m.host}:${m.port}")
       IO(Udp) ! Udp.Bind(self, new InetSocketAddress(m.host, m.port.toInt))
       context.become(connected(sender()))
     case Udp.Received(_, _) =>
-      log.error("Ucp is disconnected but the actor is still being sent messages")
+      actorLog.error("Ucp is disconnected but the actor is still being sent messages")
   }
 
   def connected(socket: ActorRef): Receive = {
     case Udp.Received(data, remote) =>
-      log.info(data.utf8String)
+      actorLog.info(data.utf8String)
     case Udp.Unbind =>
-      log.info("Unbinding Udp server")
+      actorLog.info("Unbinding Udp server")
       socket ! Udp.Unbind
     case Udp.Unbound =>
-      log.info("Stopping Udp server")
+      actorLog.info("Stopping Udp server")
       context.stop(self)
       context.become(disconnected)
   }
 
   /** Log Name on Start */
   override def preStart: Unit = {
-    log.debug(s"Starting ${this.getClass.getName}")
+    actorLog.debug(s"Starting ${this.getClass.getName}")
   }
 
   /** Log Name on Stop */
   override def postStop: Unit = {
-    log.debug(s"Stopping ${this.getClass.getName}")
+    actorLog.debug(s"Stopping ${this.getClass.getName}")
   }
 
 }
