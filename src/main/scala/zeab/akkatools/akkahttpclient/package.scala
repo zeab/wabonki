@@ -3,7 +3,9 @@ package zeab.akkatools
 //Imports
 import akka.stream.scaladsl.Source
 import akka.util.ByteString
-import zeab.seed.http.{HttpMethods, HttpSeed}
+import zeab.seed.http.HttpSeed
+import zeab.seed.http.HttpMethods.get
+import zeab.seed.http.{HttpMethods => seedMethods}
 import zeab.seed.http.httpclient.{HttpClientError, HttpClientResponse}
 //Java
 import java.text.SimpleDateFormat
@@ -37,7 +39,7 @@ package object akkahttpclient {
   //Main invoke for the single request http client that comes with akka
   def invokeAsyncHttpClientResponse(
                                      url: String,
-                                     method: String = HttpMethods.get,
+                                     method: String = get,
                                      body: String = "",
                                      headers: Map[String, String] = Map.empty,
                                      metaData: Map[String, String] = Map.empty,
@@ -62,7 +64,7 @@ package object akkahttpclient {
   //Return the http client as the source for a stream
   def invokeAsSource(
                       url: String,
-                      method: String = HttpMethods.get,
+                      method: String = get,
                       body: String = "",
                       headers: Map[String, String] = Map.empty,
                       metaData: Map[String, String] = Map.empty,
@@ -73,18 +75,18 @@ package object akkahttpclient {
   //Creates the actual http request that is used in both invokes
   private def createHttpRequest(
                                  url: String,
-                                 method: String = HttpMethods.get,
+                                 method: String = get,
                                  body: String = "",
                                  headers: Map[String, String] = Map.empty,
                                  metaData: Map[String, String] = Map.empty,
                                ): Either[HttpClientError, HttpRequest] ={
     val requestMethod: HttpMethod =
       method match {
-        case HttpMethods.get => akkaMethods.GET
-        case HttpMethods.post => akkaMethods.POST
-        case HttpMethods.put => akkaMethods.PUT
-        case HttpMethods.delete => akkaMethods.DELETE
-        case HttpMethods.trace => akkaMethods.TRACE
+        case seedMethods.get => akkaMethods.GET
+        case seedMethods.post => akkaMethods.POST
+        case seedMethods.put => akkaMethods.PUT
+        case seedMethods.delete => akkaMethods.DELETE
+        case seedMethods.trace => akkaMethods.TRACE
       }
 
     val requestHeaders: List[RawHeader] = (authorization(url, method, body, headers, metaData) ++ headers).map{header =>
