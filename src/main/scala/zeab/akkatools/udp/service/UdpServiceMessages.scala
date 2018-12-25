@@ -1,10 +1,10 @@
 package zeab.akkatools.udp.service
 
-object UdpServiceMessages {
+object UdpServiceMessages extends UdpServiceEnvGrok{
 
   case class StartUdpServer(
-                             port: String = "8125",
-                             host: String = "0.0.0.0"
+                             port: String = udpServicePort,
+                             host: String = udpServiceHost
                            )
 
 }

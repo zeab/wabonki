@@ -5,7 +5,7 @@ import zeab.envgrok.EnvGrok
 
 trait UdpServiceEnvGrok extends EnvGrok {
 
-  val udpServiceHost: String = envGrok("UDP_SERVICE_HOST", "0.0.0.0")
+  val udpServiceHost: String = envGrok("UDP_SERVICE_HOST", "localhost")
   val udpServicePort: String = envGrok("UDP_SERVICE_PORT", "8125")
 
 }

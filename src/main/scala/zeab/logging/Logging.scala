@@ -14,8 +14,15 @@ trait Logging extends EnvGrok{
   //Set all the log levels
   val rootLogLevel: Level = getLogLevel("ROOT_LOG_LEVEL", "INFO")
   loggerContext.getLogger(Logger.ROOT_LOGGER_NAME).setLevel(rootLogLevel)
+
   val akkaLogLevel: Level = getLogLevel("AKKA_LOG_LEVEL", "INFO")
-  loggerContext.getLogger("file").setLevel(akkaLogLevel)
+  loggerContext.getLogger("akka").setLevel(akkaLogLevel)
+
+  val fileLogLevel: Level = getLogLevel("FILE_LOG_LEVEL", "INFO")
+  loggerContext.getLogger("file").setLevel(fileLogLevel)
+
+  val kafkaLogLevel: Level = getLogLevel("KAFKA_LOG_LEVEL", "WARN")
+  loggerContext.getLogger("org.apache.kafka").setLevel(kafkaLogLevel)
 
   //Log to console
   val log: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)

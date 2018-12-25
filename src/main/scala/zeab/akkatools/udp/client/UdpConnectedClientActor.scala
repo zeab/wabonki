@@ -10,6 +10,8 @@ import akka.event.{Logging, LoggingAdapter}
 import akka.io.{IO, UdpConnected}
 import akka.util.ByteString
 
+//TODO Told to subscribe to the event bus as to pull down info with out having to always know where this udp client actors are
+
 class UdpConnectedClientActor(host: String, port: String) extends Actor {
 
   val actorLog: LoggingAdapter = Logging(context.system, this)
