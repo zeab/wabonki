@@ -24,6 +24,9 @@ trait Logging extends EnvGrok{
   //Log to console
   val log: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)
 
+  //Log to consume without json wrapping
+  val logRaw: Logger = LoggerFactory.getLogger("stdout")
+
   def getLogLevel(key:String, default:String): Level ={
     envGrok(key, default).toUpperCase match {
       case "ERROR" => Level.ERROR
