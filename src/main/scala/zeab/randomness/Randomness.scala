@@ -6,9 +6,9 @@ import java.util.concurrent.ThreadLocalRandom
 trait Randomness {
 
   //Core Randomness
-  def getRandomInt(max:Int, min:Int = 1): Int = ThreadLocalRandom.current.nextInt(min, max)
-  def getRandomDouble(max:Double, min:Double = 1): Double = ThreadLocalRandom.current.nextDouble(min, max)
-  def getRandomLong(max:Long, min:Long = 1): Long = ThreadLocalRandom.current.nextLong(min, max)
+  def getRandomInt(max:Int = Int.MaxValue, min:Int = 1): Int = ThreadLocalRandom.current.nextInt(min, max)
+  def getRandomDouble(max:Double = Double.MaxValue, min:Double = 1): Double = ThreadLocalRandom.current.nextDouble(min, max)
+  def getRandomLong(max:Long = Long.MaxValue, min:Long = 1): Long = ThreadLocalRandom.current.nextLong(min, max)
 
   //Just Letters
   def getRandomAlphaString(length: Int): String = {
