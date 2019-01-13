@@ -69,12 +69,19 @@ package object akkahttpclient {
                         body: String = "",
                         headers: Map[String, String] = Map.empty,
                         metaData: Map[String, String] = Map.empty,
-                      ): Either[HttpClientError, Source[ByteString, Any]] =
-      createHttpRequest(url, method, body, headers, metaData).map(_.entity.dataBytes)
-
+                      )
+                      (implicit actorSystem:ActorSystem, executionContext:ExecutionContext, mat:ActorMaterializer): Future[Either[HttpClientError, Source[ByteString, Any]]] ={
+      createHttpRequest(url, method, body, headers, metaData) match {
+        case Right(httpRequest) =>
+          for{
+            source <- Http().singleRequest(httpRequest).map(_.entity.dataBytes)
+          } yield Right(source)
+        case Left(ex) => Future(Left(ex))
+      }
+    }
 
     //Creates the actual http request that is used in both invokes
-    private def createHttpRequest(
+    def createHttpRequest(
                                    url: String,
                                    method: String = get,
                                    body: String = "",

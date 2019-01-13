@@ -2,6 +2,6 @@
 //Versions for all the modules
 object Versions {
 
-  val wabonkiVersion: String = s"0.0.20"
+  val wabonkiVersion: String = s"0.0.24"
 
 }

@@ -5,8 +5,8 @@ object Dependencies {
 
   //List of Versions
   val V = new {
-    val akka                        = "2.5.14"
-    val akkaHttp                    = "10.1.3"
+    val akka                        = "2.5.19"
+    val akkaHttp                    = "10.1.7"
     val akkaHttpCirce               = "1.21.0"
     val akkaKafka                   = "0.22"
     val circe                       = "0.9.3"
