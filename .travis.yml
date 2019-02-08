@@ -3,7 +3,7 @@ language: scala
 dist: xenial
 
 scala:
-   - 2.12.6
+  - 2.12.6
 
 branches:
   only:
@@ -19,4 +19,4 @@ jdk:
   - openjdk8
 
 script:
-- sbt clean test package
+  - sbt ++$TRAVIS_SCALA_VERSION test
