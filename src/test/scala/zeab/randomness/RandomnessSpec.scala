@@ -41,9 +41,11 @@ class RandomnessSpec extends FunSuite{
 
   test("Random Month/Day should return a valid month and day number combo") {
     val (month, day): (String, String) = getRandomMonthDay
-    if (month.toInt == 2) assert(day.toInt <= 29)
-    else if (month.toInt == 4 | month.toInt == 6 | month.toInt == 9 | month.toInt == 11) assert(day.toInt <= 30)
-    else assert(day.toInt <= 31)
+    month.toInt match {
+      case 2 => assert(day.toInt <= 29)
+      case 4 | 6 | 9 | 11 => assert(day.toInt <= 30)
+      case _ => assert(day.toInt <= 31)
+    }
   }
 
   test("Random Numeric as String should return only numbers") {
