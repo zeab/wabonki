@@ -2,6 +2,8 @@ package zeab.randomness
 
 //Imports
 import java.util.concurrent.ThreadLocalRandom
+//Scala
+import scala.util.Random
 
 trait Randomness {
 
@@ -46,11 +48,14 @@ trait Randomness {
     //Let the tail recursion loop <- this is basically a thread safe string builder
     def worker(length: Int, chars: Seq[Char], randomString: String = ""): String = {
       if (length == 0) randomString
-      else worker(length - 1, chars, s"$randomString${chars(getRandomInt(chars.length, 0))}")
+      else worker(length - 1, chars, randomString + Random.shuffle(chars).take(1).mkString)
     }
 
     worker(length, chars)
   }
+
+  //TODO If the above Random.shuffle is better then the commented out code below... remove this comment
+  //s"$randomString${chars(getRandomInt(chars.length, 0))}"
 
   //Randomly generates a month and day
   def getRandomMonthDay: (String, String) = {

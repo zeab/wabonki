@@ -55,3 +55,5 @@ trait EnvVars {
   }
 
 }
+
+object EnvVars extends EnvVars
