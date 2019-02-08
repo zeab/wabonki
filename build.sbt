@@ -5,7 +5,7 @@ import Dependencies._
 import Resolvers.allResolvers
 
 //Sbt Log Level
-logLevel := Level.Debug
+logLevel := Level.Info
 
 //Add all the command alias's
 CommandAlias.allCommandAlias
