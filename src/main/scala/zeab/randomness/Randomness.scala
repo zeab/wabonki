@@ -3,7 +3,7 @@ package zeab.randomness
 //Imports
 import java.text.DecimalFormat
 import java.util.concurrent.ThreadLocalRandom
-
+//Scala
 import scala.annotation.tailrec
 
 /**
@@ -71,7 +71,13 @@ trait Randomness {
       }
   }
 
-  def getRandomDouble(decimalPlaces:Int, max: Double, min: Double): String ={
+  /** Returns the next generated pseudorandom between user defined max and user defined min from the current thread local random instance with specific amount of decimal places.
+    *
+    * @param max The greatest Double the return can possibly be (inclusive)
+    * @param min The least Double the return can possibly be (inclusive)
+    * @return A pseudorandom Double
+    */
+  def getRandomDouble(max: Double, min: Double, decimalPlaces:Int): String ={
     val formatter: DecimalFormat = new DecimalFormat(s"#.${List.fill(decimalPlaces)("#").mkString}")
     formatter.format(getRandomDouble(max, min))
   }
