@@ -7,6 +7,8 @@ import scala.util.matching.Regex
 //ScalaTest
 import org.scalatest.FunSuite
 
+//TODO Make these a little bit more fined tuned and hit all the bounty cases
+
 class RandomnessSpec extends FunSuite{
 
   test("Random Int should return a number between 5 and 10") {
@@ -79,7 +81,7 @@ class RandomnessSpec extends FunSuite{
   }
 
   test("Random Custom as String should return whatever I have it") {
-    val randomCustom: String = getRandomCustomString(Seq('k', ':'), 10, Some(3))
+    val randomCustom: String = getRandomCustomString(10, Some(3), Seq('k', ':'))
     val numberPattern: Regex = "[k,:]+".r
     numberPattern.findFirstMatchIn(randomCustom) match {
       case Some(_) => assert(true)
