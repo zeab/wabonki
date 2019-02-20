@@ -42,7 +42,7 @@ trait Randomness {
     *       The Bound (max) is exclusive
     *       Which is why its necessary to sometimes add 1 behind the scenes to the max value so this becomes inclusive
     */
-  def getRandomLong(max: Long = Long.MaxValue, min: Long = 0L): Long = max match {
+  def getRandomLong(max: Long = Long.MaxValue, min: Long = Long.MinValue): Long = max match {
     case Int.MaxValue => ThreadLocalRandom.current.nextLong(min, max)
     case _ => ThreadLocalRandom.current.nextLong(min, max + 1L)
   }
