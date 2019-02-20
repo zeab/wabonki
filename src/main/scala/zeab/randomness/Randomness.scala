@@ -56,6 +56,7 @@ trait Randomness {
     *       The origin (min) is inclusive
     *       The bound (max) is exclusive
     *       Have to do a little math on the decimal point to determine how much you need to add in order to make the max value inclusive
+    *       We don't need to add 1 to the double that are valid Int's because a max of 1 min of 0 would result in a possible value of 1.1
     */
   def getRandomDouble(max: Double = Double.MaxValue, min: Double = Double.MinValue): Double = max match{
     case Double.MaxValue => ThreadLocalRandom.current.nextDouble(min, max)
