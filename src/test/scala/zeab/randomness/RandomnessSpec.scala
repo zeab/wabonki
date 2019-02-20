@@ -31,6 +31,11 @@ class RandomnessSpec extends FunSuite{
     assert(randomDouble <= 1 && randomDouble >= 0)
   }
 
+  test("Random Double should return a number between 0.51 and 0.510000000000001") {
+    val randomDouble: Double = getRandomDouble(0.510000000000001, 0.51)
+    assert(randomDouble <= 0.510000000000001 && randomDouble >= 0.51)
+  }
+
   test("Random Long should return a number between 5 and 10") {
     val randomLong: Long = getRandomLong(10, 5)
     assert(randomLong <= 10 && randomLong >= 5)

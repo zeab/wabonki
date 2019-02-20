@@ -21,10 +21,10 @@ trait Randomness {
     *
     * @param max The greatest Int the return can possibly be (inclusive)
     * @param min The least Int the return can possibly be (inclusive)
-    * @return Pseudorandom Int
+    * @return A pseudorandom Int
     * @note Within the java implementation of ThreadLocalRandom
     *       The origin (min) is inclusive
-    *       The Bound (max) is exclusive
+    *       The bound (max) is exclusive
     *       Which is why its necessary to sometimes add 1 behind the scenes to the max value so this becomes inclusive
     */
   def getRandomInt(max: Int = Int.MaxValue, min: Int = Int.MinValue): Int = max match {
@@ -36,10 +36,10 @@ trait Randomness {
     *
     * @param max The greatest Long the return can possibly be (inclusive)
     * @param min The least Long the return can possibly be (inclusive)
-    * @return Pseudorandom Long
+    * @return A pseudorandom Long
     * @note Within the java implementation of ThreadLocalRandom
     *       The origin (min) is inclusive
-    *       The Bound (max) is exclusive
+    *       The bound (max) is exclusive
     *       Which is why its necessary to sometimes add 1 behind the scenes to the max value so this becomes inclusive
     */
   def getRandomLong(max: Long = Long.MaxValue, min: Long = Long.MinValue): Long = max match {
@@ -51,21 +51,29 @@ trait Randomness {
     *
     * @param max The greatest Double the return can possibly be (inclusive)
     * @param min The least Double the return can possibly be (inclusive)
-    * @return Pseudorandom Double
+    * @return A pseudorandom Double
     * @note Within the java implementation of ThreadLocalRandom
     *       The origin (min) is inclusive
-    *       The Bound (max) is exclusive
-    *       This since its a double is not necessary to add 1 because that results int an off by 1 error
-    *       A max of 10 and min of 4 without the plus 1 correction the others have will possibly yield 10.1-10.9 which is outside value zone
+    *       The bound (max) is exclusive
+    *       Have to do a little math on the decimal point to determine how much you need to add in order to make the max value inclusive
     */
-  def getRandomDouble(max: Double = Double.MaxValue, min: Double = Double.MinValue): Double = ThreadLocalRandom.current.nextDouble(min, max)
+  def getRandomDouble(max: Double = Double.MaxValue, min: Double = Double.MinValue): Double = max match{
+    case Double.MaxValue => ThreadLocalRandom.current.nextDouble(min, max)
+    case max: Double =>
+      if(max.isValidInt) ThreadLocalRandom.current.nextDouble(min, max)
+      else {
+        val decimalPlaces: Int = max.toString.split('.').lastOption.getOrElse("").length
+        val maxInclusive: Double = ("0." + List.fill(decimalPlaces)(0).mkString + "1").toDouble + max
+        ThreadLocalRandom.current.nextDouble(min, maxInclusive)
+      }
+  }
 
   //Letters and numbers
   /** Returns a string of pseudorandom numbers and lower/upper case letters from the current thread local random instance.
     *
     * @param maxLength The greatest number of char the random string the return can possibly be (inclusive)
     * @param minLength The least number of char the random string will be; defaults to max value
-    * @return Pseudorandom Letters and Numbers string
+    * @return A pseudorandom Letters and Numbers string
     */
   def getRandomAlphaNumericString(maxLength: Int, minLength: Option[Int] = None): String = {
     val chars: Seq[Char] = ('a' to 'z') ++ ('A' to 'Z') ++ ('0' to '9')
@@ -77,7 +85,7 @@ trait Randomness {
     *
     * @param maxLength The greatest number of char the random string the return can possibly be (inclusive)
     * @param minLength The least number of char the random string will be; defaults to max value
-    * @return Pseudorandom Letters only string
+    * @return A pseudorandom Letters only string
     */
   def getRandomAlphaString(maxLength: Int, minLength: Option[Int] = None): String = {
     val chars: Seq[Char] = ('a' to 'z') ++ ('A' to 'Z')
@@ -89,7 +97,7 @@ trait Randomness {
     *
     * @param maxLength The greatest number of char the random string the return can possibly be
     * @param minLength The least number of char the random string will be; defaults to max value
-    * @return Pseudorandom Letters and Numbers string
+    * @return A pseudorandom Letters and Numbers string
     */
   def getRandomNumericString(maxLength: Int, minLength: Option[Int] = None): String = {
     val chars: Seq[Char] = '0' to '9'
@@ -105,7 +113,7 @@ trait Randomness {
     * @param chars     The seq of character's you wish to choose from to form this string
     * @param maxLength The greatest number of char the random string the return can possibly be
     * @param minLength The least number of char the random string will be; defaults to max value
-    * @return Pseudorandom string from user defined values
+    * @return A pseudorandom string from user defined values
     */
   def getRandomCustomString(maxLength: Int, minLength: Option[Int], chars: Seq[Char]): String = {
 
