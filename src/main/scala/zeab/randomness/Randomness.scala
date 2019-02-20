@@ -1,7 +1,9 @@
 package zeab.randomness
 
 //Imports
+import java.text.DecimalFormat
 import java.util.concurrent.ThreadLocalRandom
+
 import scala.annotation.tailrec
 
 /**
@@ -67,6 +69,11 @@ trait Randomness {
         val maxInclusive: Double = ("0." + List.fill(decimalPlaces)(0).mkString + "1").toDouble + max
         ThreadLocalRandom.current.nextDouble(min, maxInclusive)
       }
+  }
+
+  def getRandomDouble(decimalPlaces:Int, max: Double, min: Double): String ={
+    val formatter: DecimalFormat = new DecimalFormat(s"#.${List.fill(decimalPlaces)("#").mkString}")
+    formatter.format(getRandomDouble(max, min))
   }
 
   //Letters and numbers
