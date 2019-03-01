@@ -2,6 +2,8 @@ package zeab.randomness
 
 //Imports
 import java.text.DecimalFormat
+import java.time.format.DateTimeFormatter
+import java.time.{Instant, ZoneId, ZonedDateTime}
 import java.util.concurrent.ThreadLocalRandom
 //Scala
 import scala.annotation.tailrec
@@ -19,34 +21,16 @@ import scala.annotation.tailrec
   */
 trait Randomness {
 
-  /** Returns the next generated pseudorandom between Int.MaxValue and Int.MinValue from the current thread local random instance.
+  /** Returns the next generated pseudorandom Double between user defined max and user defined min from the current thread local random instance with specific amount of decimal places.
     *
-    * @param max The greatest Int the return can possibly be (inclusive)
-    * @param min The least Int the return can possibly be (inclusive)
-    * @return A pseudorandom Int
-    * @note Within the java implementation of ThreadLocalRandom
-    *       The origin (min) is inclusive
-    *       The bound (max) is exclusive
-    *       Which is why its necessary to sometimes add 1 behind the scenes to the max value so this becomes inclusive
+    * @param max           The greatest Double the return can possibly be (inclusive)
+    * @param min           The least Double the return can possibly be (inclusive)
+    * @param decimalPlaces The amount of decimal places in the returned value
+    * @return A pseudorandom Double
     */
-  def getRandomInt(max: Int = Int.MaxValue, min: Int = Int.MinValue): Int = max match {
-    case Int.MaxValue => ThreadLocalRandom.current.nextInt(min, max)
-    case _ => ThreadLocalRandom.current.nextInt(min, max + 1)
-  }
-
-  /** Returns the next generated pseudorandom between Long.MaxValue and Long.MinValue from the current thread local random instance.
-    *
-    * @param max The greatest Long the return can possibly be (inclusive)
-    * @param min The least Long the return can possibly be (inclusive)
-    * @return A pseudorandom Long
-    * @note Within the java implementation of ThreadLocalRandom
-    *       The origin (min) is inclusive
-    *       The bound (max) is exclusive
-    *       Which is why its necessary to sometimes add 1 behind the scenes to the max value so this becomes inclusive
-    */
-  def getRandomLong(max: Long = Long.MaxValue, min: Long = Long.MinValue): Long = max match {
-    case Int.MaxValue => ThreadLocalRandom.current.nextLong(min, max)
-    case _ => ThreadLocalRandom.current.nextLong(min, max + 1L)
+  def getRandomDoubleFormatted(max: Double = Double.MaxValue, min: Double = 1.0, decimalPlaces: Int = 2): String = {
+    val formatter: DecimalFormat = new DecimalFormat(s"#.${List.fill(decimalPlaces)("#").mkString}")
+    formatter.format(getRandomDouble(max, min))
   }
 
   /** Returns the next generated pseudorandom between Double.MaxValue and Double.MinValue from the current thread local random instance.
@@ -60,10 +44,10 @@ trait Randomness {
     *       Have to do a little math on the decimal point to determine how much you need to add in order to make the max value inclusive
     *       We don't need to add 1 to the double that are valid Int's because a max of 1 min of 0 would result in a possible value of 1.1
     */
-  def getRandomDouble(max: Double = Double.MaxValue, min: Double = Double.MinValue): Double = max match{
+  def getRandomDouble(max: Double = Double.MaxValue, min: Double = 1.0): Double = max match {
     case Double.MaxValue => ThreadLocalRandom.current.nextDouble(min, max)
     case max: Double =>
-      if(max.isValidInt) ThreadLocalRandom.current.nextDouble(min, max)
+      if (max.isValidInt) ThreadLocalRandom.current.nextDouble(min, max)
       else {
         val decimalPlaces: Int = max.toString.split('.').lastOption.getOrElse("").length
         val maxInclusive: Double = ("0." + List.fill(decimalPlaces)(0).mkString + "1").toDouble + max
@@ -71,54 +55,115 @@ trait Randomness {
       }
   }
 
-  /** Returns the next generated pseudorandom between user defined max and user defined min from the current thread local random instance with specific amount of decimal places.
+  /** Returns the next generated pseudorandom Date and Time
     *
-    * @param max The greatest Double the return can possibly be (inclusive)
-    * @param min The least Double the return can possibly be (inclusive)
-    * @return A pseudorandom Double
+    * @param alphaDateTime  The most distant a timestamp should be for the time range
+    * @param omegaDateTime  The least distant a timestamp should be for the time range
+    * @param dateTimeFormat The format the date and time should be in
+    * @param zoneId         The timezone
+    * @return A pseudorandom Formatted String of ZonedDateTime
     */
-  def getRandomDouble(max: Double, min: Double, decimalPlaces:Int): String ={
-    val formatter: DecimalFormat = new DecimalFormat(s"#.${List.fill(decimalPlaces)("#").mkString}")
-    formatter.format(getRandomDouble(max, min))
+  def getRandomZonedDateTime(
+                              alphaDateTime: ZonedDateTime,
+                              omegaDateTime: ZonedDateTime,
+                              dateTimeFormat: String,
+                              zoneId: Option[String]
+                            ): String = {
+    val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(dateTimeFormat)
+    getRandomZonedDateTime(alphaDateTime, omegaDateTime, zoneId)
+      .format(dateTimeFormatter)
   }
 
-  //Letters and numbers
+  /** Returns the next generated pseudorandom Date and Time
+    *
+    * @param alphaDateTime The most distant a timestamp should be for the time range
+    * @param omegaDateTime The least distant a timestamp should be for the time range
+    * @param zoneId        The timezone
+    * @return A pseudorandom ZonedDateTime
+    */
+  def getRandomZonedDateTime(alphaDateTime: ZonedDateTime, omegaDateTime: ZonedDateTime, zoneId: Option[String] = None): ZonedDateTime = {
+    val min: Long = alphaDateTime.toInstant.toEpochMilli
+    val max: Long = omegaDateTime.toInstant.toEpochMilli
+    val randomDateTimeEpoch: Long = getRandomLong(max, min)
+    zoneId match {
+      case Some(zone) => Instant.ofEpochMilli(randomDateTimeEpoch).atZone(ZoneId.of(zone))
+      case None => Instant.ofEpochMilli(randomDateTimeEpoch).atZone(ZoneId.of("UTC"))
+    }
+  }
+
+  /** Returns the next generated pseudorandom between Long.MaxValue and Long.MinValue from the current thread local random instance.
+    *
+    * @param max The greatest Long the return can possibly be (inclusive)
+    * @param min The least Long the return can possibly be (inclusive)
+    * @return A pseudorandom Long
+    * @note Within the java implementation of ThreadLocalRandom
+    *       The origin (min) is inclusive
+    *       The bound (max) is exclusive
+    *       Which is why its necessary to sometimes add 1 behind the scenes to the max value so this becomes inclusive
+    */
+  def getRandomLong(max: Long = Long.MaxValue, min: Long = 1L): Long = max match {
+    case Int.MaxValue => ThreadLocalRandom.current.nextLong(min, max)
+    case _ => ThreadLocalRandom.current.nextLong(min, max + 1L)
+  }
+
+  /** Returns the next generated pseudorandom Date and Time
+    *
+    * @param pastOffsetInSeconds   The most distant a datetime should in seconds to be considered for the time range
+    * @param futureOffsetInSeconds The least distant a datetime should in seconds to be considered for the time range
+    * @param dateTimeFormat        The format of the returned datetime
+    * @param mediumDateTime        The middle of the datetime range
+    * @return A pseudorandom Formatted String of ZonedDateTime
+    */
+  def getRandomZonedDateTimeByOffset(
+                                      dateTimeFormat: String,
+                                      pastOffsetInSeconds: Long,
+                                      futureOffsetInSeconds: Long,
+                                      mediumDateTime: ZonedDateTime
+                                    ): String = {
+    val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(dateTimeFormat)
+    getRandomZonedDateTimeByOffset(pastOffsetInSeconds, futureOffsetInSeconds, mediumDateTime)
+      .format(dateTimeFormatter)
+  }
+
+  /** Returns the next generated pseudorandom Date and Time
+    *
+    * @param pastOffsetInSeconds   The most distant a datetime should in seconds to be considered for the time range
+    * @param futureOffsetInSeconds The least distant a datetime should in seconds to be considered for the time range
+    * @param mediumDateTime        The middle of the datetime range
+    * @return A pseudorandom ZonedDateTime
+    */
+  def getRandomZonedDateTimeByOffset(
+                                      pastOffsetInSeconds: Long,
+                                      futureOffsetInSeconds: Long,
+                                      mediumDateTime: ZonedDateTime
+                                    ): ZonedDateTime = {
+    val alphaDateTime: ZonedDateTime = mediumDateTime.minusSeconds(pastOffsetInSeconds)
+    val omegaDateTime: ZonedDateTime = mediumDateTime.plusSeconds(pastOffsetInSeconds)
+    getRandomZonedDateTime(alphaDateTime, omegaDateTime, Some(mediumDateTime.getZone.toString))
+  }
+
   /** Returns a string of pseudorandom numbers and lower/upper case letters from the current thread local random instance.
     *
     * @param maxLength The greatest number of char the random string the return can possibly be (inclusive)
     * @param minLength The least number of char the random string will be; defaults to max value
     * @return A pseudorandom Letters and Numbers string
     */
-  def getRandomAlphaNumericString(maxLength: Int, minLength: Option[Int] = None): String = {
+  def getRandomAlphaNumeric(maxLength: Int, minLength: Option[Int] = None): String = {
     val chars: Seq[Char] = ('a' to 'z') ++ ('A' to 'Z') ++ ('0' to '9')
-    getRandomCustomString(maxLength, minLength, chars)
+    getRandomCustom(maxLength, minLength, chars)
   }
 
-  //Just Letters
   /** Returns a string of pseudorandom lower and upper case letters from the current thread local random instance.
     *
     * @param maxLength The greatest number of char the random string the return can possibly be (inclusive)
     * @param minLength The least number of char the random string will be; defaults to max value
     * @return A pseudorandom Letters only string
     */
-  def getRandomAlphaString(maxLength: Int, minLength: Option[Int] = None): String = {
+  def getRandomAlpha(maxLength: Int, minLength: Option[Int] = None): String = {
     val chars: Seq[Char] = ('a' to 'z') ++ ('A' to 'Z')
-    getRandomCustomString(maxLength, minLength, chars)
+    getRandomCustom(maxLength, minLength, chars)
   }
 
-  //Numbers only
-  /** Returns a string of pseudorandom numbers from the current thread local random instance.
-    *
-    * @param maxLength The greatest number of char the random string the return can possibly be
-    * @param minLength The least number of char the random string will be; defaults to max value
-    * @return A pseudorandom Letters and Numbers string
-    */
-  def getRandomNumericString(maxLength: Int, minLength: Option[Int] = None): String = {
-    val chars: Seq[Char] = '0' to '9'
-    getRandomCustomString(maxLength, minLength, chars)
-  }
-
-  //User defined char-set
   /** Returns a string of pseudorandom user defined input from the current thread local random instance.
     *
     * This is the work horse of the entire Random String set of functions as they are all just hard coded user defined char sets
@@ -129,7 +174,7 @@ trait Randomness {
     * @param minLength The least number of char the random string will be; defaults to max value
     * @return A pseudorandom string from user defined values
     */
-  def getRandomCustomString(maxLength: Int, minLength: Option[Int], chars: Seq[Char]): String = {
+  def getRandomCustom(maxLength: Int, minLength: Option[Int], chars: Seq[Char]): String = {
 
     //Figure out if its a random length or a static length
     val length: Int = minLength match {
@@ -147,22 +192,32 @@ trait Randomness {
     worker(length, chars)
   }
 
-  //Randomly generates a month and day
-  def getRandomMonthDay: (String, String) = {
-    val month: Int = getRandomInt(12)
-    val day: Int = getRandomInt(31)
-    month match {
-      case 2 =>
-        if (day > 29) getRandomMonthDay
-        else month.toString -> day.toString
-      case 4 | 6 | 9 | 11 =>
-        if (day > 30) getRandomMonthDay
-        else month.toString -> day.toString
-      case _ => month.toString -> day.toString
-    }
+  /** Returns the next generated pseudorandom between Int.MaxValue and Int.MinValue from the current thread local random instance.
+    *
+    * @param max The greatest Int the return can possibly be (inclusive)
+    * @param min The least Int the return can possibly be (inclusive)
+    * @return A pseudorandom Int
+    * @note Within the java implementation of ThreadLocalRandom
+    *       The origin (min) is inclusive
+    *       The bound (max) is exclusive
+    *       Which is why its necessary to sometimes add 1 behind the scenes to the max value so this becomes inclusive
+    */
+  def getRandomInt(max: Int = Int.MaxValue, min: Int = 1): Int = max match {
+    case Int.MaxValue => ThreadLocalRandom.current.nextInt(min, max)
+    case _ => ThreadLocalRandom.current.nextInt(min, max + 1)
+  }
+
+  /** Returns a string of pseudorandom numbers from the current thread local random instance.
+    *
+    * @param maxLength The greatest number of char the random string the return can possibly be
+    * @param minLength The least number of char the random string will be; defaults to max value
+    * @return A pseudorandom Letters and Numbers string
+    */
+  def getRandomNumeric(maxLength: Int, minLength: Option[Int] = None): String = {
+    val chars: Seq[Char] = '0' to '9'
+    getRandomCustom(maxLength, minLength, chars)
   }
 
 }
 
-//So we can use it as is without having to extend it if we don't want
 object Randomness extends Randomness

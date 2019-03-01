@@ -46,17 +46,8 @@ class RandomnessSpec extends FunSuite{
     assert(randomLong <= 1 && randomLong >= 0)
   }
 
-  test("Random Month/Day should return a valid month and day number combo") {
-    val (month, day): (String, String) = getRandomMonthDay
-    month.toInt match {
-      case 2 => assert(day.toInt <= 29)
-      case 4 | 6 | 9 | 11 => assert(day.toInt <= 30)
-      case _ => assert(day.toInt <= 31)
-    }
-  }
-
   test("Random Numeric as String should return only numbers") {
-    val randomNumeric: String = getRandomNumericString(5)
+    val randomNumeric: String = getRandomNumeric(5)
     val numberPattern: Regex = "[0-9]+".r
     numberPattern.findFirstMatchIn(randomNumeric) match {
       case Some(_) => assert(true)
@@ -66,7 +57,7 @@ class RandomnessSpec extends FunSuite{
   }
 
   test("Random Alpha as String should return only letters") {
-    val randomAlpha: String = getRandomAlphaString(5)
+    val randomAlpha: String = getRandomAlpha(5)
     val numberPattern: Regex = "[a-zA-Z]+".r
     numberPattern.findFirstMatchIn(randomAlpha) match {
       case Some(_) => assert(true)
@@ -76,7 +67,7 @@ class RandomnessSpec extends FunSuite{
   }
 
   test("Random Alpha Numeric as String should return letters and numbers") {
-    val randomAlphaNumeric: String = getRandomAlphaNumericString(5, Some(3))
+    val randomAlphaNumeric: String = getRandomAlphaNumeric(5, Some(3))
     val numberPattern: Regex = "[0-9a-zA-Z]+".r
     numberPattern.findFirstMatchIn(randomAlphaNumeric) match {
       case Some(_) => assert(true)
@@ -86,7 +77,7 @@ class RandomnessSpec extends FunSuite{
   }
 
   test("Random Custom as String should return whatever I have it") {
-    val randomCustom: String = getRandomCustomString(10, Some(3), Seq('k', ':'))
+    val randomCustom: String = getRandomCustom(10, Some(3), Seq('k', ':'))
     val numberPattern: Regex = "[k,:]+".r
     numberPattern.findFirstMatchIn(randomCustom) match {
       case Some(_) => assert(true)
