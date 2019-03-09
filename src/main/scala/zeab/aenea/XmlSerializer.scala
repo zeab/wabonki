@@ -4,7 +4,6 @@ package zeab.aenea
 import scala.reflect.runtime.universe._
 
 object XmlSerializer {
-  //"Integer" | "Boolean" | "String" | "Long" | "Double"
 
   def xmlSerialize[T](objectToSerialize: Any)(implicit typeTag: TypeTag[T]): String ={
     def objToMap(objectToSerialize: Any): Map[String, Any] ={
@@ -23,18 +22,16 @@ object XmlSerializer {
     }
     val fullObjToMap: Map[String, Any] = Map(objectToSerialize.getClass.getSimpleName.seq(0).toLower + objectToSerialize.getClass.getSimpleName.drop(1) -> objToMap(objectToSerialize))
 
-    def serialize(obj:Map[String, Any]): String ={
-
-      obj.map{a =>
-        val nodeName = a._1
-        val as = a._2.getClass
-        println()
-      }
-
-      ""
+    def serialize(objectToSerialize:Map[String, Any]): String ={
+      objectToSerialize.map{node =>
+        val (nodeName, nodeWrappedValue): (String, Any) = node
+        val nodeUnwrappedValue: String =
+          if(nodeWrappedValue.getClass.getSimpleName == "String") nodeWrappedValue.asInstanceOf[String]
+          else serialize(nodeWrappedValue.asInstanceOf[Map[String, Any]])
+        s"<$nodeName>$nodeUnwrappedValue</$nodeName>"
+      }.mkString
     }
-    val s = serialize(fullObjToMap)
-    s
+    serialize(fullObjToMap)
   }
 
   def xmlDeserialize[T](xmlText: String)(implicit typeTag: TypeTag[T]): T ={

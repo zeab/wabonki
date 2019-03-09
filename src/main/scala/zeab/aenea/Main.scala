@@ -11,7 +11,7 @@ object Main {
     val single = Single("yes")
 
     //val a = XmlSerializer.xmlSerialize(person)
-    val b = XmlSerializer.xmlSerialize(single)
+    val b = XmlSerializer.xmlSerialize(personExtra)
     //val c = XmlSerializer.xmlSerialize(5L)
 
     println(b)
