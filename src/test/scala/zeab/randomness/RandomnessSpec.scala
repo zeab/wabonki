@@ -1,7 +1,7 @@
 package zeab.randomness
 
 //Imports
-import Randomness._
+import ThreadLocalRandom._
 //Scala
 import scala.util.matching.Regex
 //ScalaTest
