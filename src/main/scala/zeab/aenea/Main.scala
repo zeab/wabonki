@@ -1,20 +1,22 @@
 package zeab.aenea
 
+import zeab.aenea.models._
+
+
 object Main {
 
   def main(args: Array[String]): Unit = {
 
-    val person = Person("bob", 8, "spy")
+    //scala.collection.immutable.$colon$colon
 
-    val personExtra = PersonExtra("igor",  Info(9, "nun", Pet("moose", 22)), Other("blue"))
+    val primitives = Primitives("moose", 9, 4.6, 3F, 2L)
+    val simpleList = SimpleList("alpha", List("jo", "bert", "liz"), "omega")
 
-    val single = Single("yes")
+    val simpleOption = SimpleOption(None)
+    val complexOption = ComplexOption(None)
 
-    //val a = XmlSerializer.xmlSerialize(person)
-    val b = XmlSerializer.xmlSerialize(personExtra)
-    //val c = XmlSerializer.xmlSerialize(5L)
-
-    println(b)
+    val complexList = ComplexList(List(primitives,primitives))
+    println(XmlSerializer.xmlSerialize(complexList))
 
   }
 
