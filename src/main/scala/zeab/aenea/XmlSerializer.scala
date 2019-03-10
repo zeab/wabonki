@@ -5,7 +5,7 @@ import scala.reflect.runtime.universe._
 
 object XmlSerializer {
 
-  def xmlSerialize[T](objectToSerialize: Any)(implicit typeTag: TypeTag[T]): String = {
+  def xmlSerialize[T](objectToSerialize: Any): String = {
     def objToMap(objectToSerialize: Any): Map[String, Any] = {
       val objClass: Class[_] = objectToSerialize.getClass
       val objMirror: Mirror = runtimeMirror(objClass.getClassLoader)
@@ -53,14 +53,13 @@ object XmlSerializer {
         def unwrapNodeValue(nodeWrappedValue: Any): String = {
           val nodeUnwrappedValue: String =
             if (primitiveCheck(nodeWrappedValue.getClass.getSimpleName)) nodeWrappedValue.asInstanceOf[String]
+            else if (nodeWrappedValue.getClass.getSimpleName == "Nil$") ""
             else serialize(nodeWrappedValue.asInstanceOf[Map[String, Any]])
           if (nodeUnwrappedValue == "") s"<$nodeName/>"
           else s"<$nodeName>$nodeUnwrappedValue</$nodeName>"
         }
 
-        if (nodeWrappedValue.getClass.getSimpleName == "$colon$colon") nodeWrappedValue.asInstanceOf[List[Any]].map {
-          unwrapNodeValue
-        }.mkString
+        if (nodeWrappedValue.getClass.getSimpleName == "$colon$colon") nodeWrappedValue.asInstanceOf[List[Any]].map(unwrapNodeValue).mkString
         else unwrapNodeValue(nodeWrappedValue)
       }.mkString
     }
@@ -73,8 +72,16 @@ object XmlSerializer {
     primitive.contains(objToCheck)
   }
 
-  def xmlDeserialize[T](xmlText: String)(implicit typeTag: TypeTag[T]): T = {
-    ???
+  def xmlDeserialize[T](xmlText: String): Either[String, T] = {
+
+    //validate the xml string... which would look like what?
+
+    val xmlTextValidation = "(<.*/>|<.*>.*</.*>)".r.findFirstIn(xmlText)
+    //
+    //    if (xmlTextValidation.getOrElse("").length == xmlText.length) Right(SimpleList("", List.empty, ""))
+    //    else
+    Left("Not a valid Xml String")
+
   }
 
 }
