@@ -5,5 +5,6 @@ case class Primitives(
                      myInt:Int,
                      myDouble:Double,
                      myFloat:Float,
-                     myLong:Long
+                     myLong:Long,
+                     myBoolean:Boolean
                      )
