@@ -1,16 +1,22 @@
 package zeab.aenea
 
 //Imports
+import zeab.aenea.models.{Address, Person, PhoneNumber}
+
+import scala.reflect.runtime.{universe => ru}
 import scala.reflect.runtime.universe._
+import scala.xml.Elem
 
 object XmlSerializer {
 
-  def xmlSerialize[T](objectToSerialize: Any): String = {
+  //TODO Play code golf
+  def xmlSerialize[T](objectToSerialize: Any)(implicit typeTag: TypeTag[T]): Either[String, T] = {
     def objToMap(objectToSerialize: Any): Map[String, Any] = {
       val objClass: Class[_] = objectToSerialize.getClass
       val objMirror: Mirror = runtimeMirror(objClass.getClassLoader)
       val objType: Type = objMirror.classSymbol(objClass).toType
       val instanceMirror: InstanceMirror = objMirror.reflect(objectToSerialize)
+      //TODO Change the regex filter so that it only removes underscored named values if its a primitive
       objType.decls
         .filter(param => "value [^_]\\S".r.findFirstIn(param.toString) match {
           case Some(_) => true;
@@ -43,9 +49,6 @@ object XmlSerializer {
           else param.name.toString -> objToMap(instanceMirror.reflectField(param.asTerm).get)
         }.toMap
     }
-
-    val fullObjToMap: Map[String, Any] = Map(objectToSerialize.getClass.getSimpleName.seq(0).toLower + objectToSerialize.getClass.getSimpleName.drop(1) -> objToMap(objectToSerialize))
-
     def serialize(objectToSerialize: Map[String, Any]): String = {
       objectToSerialize.map { node =>
         val (nodeName, nodeWrappedValue): (String, Any) = node
@@ -59,29 +62,70 @@ object XmlSerializer {
           else s"<$nodeName>$nodeUnwrappedValue</$nodeName>"
         }
 
+        //This is a list btw coloncolon
         if (nodeWrappedValue.getClass.getSimpleName == "$colon$colon") nodeWrappedValue.asInstanceOf[List[Any]].map(unwrapNodeValue).mkString
         else unwrapNodeValue(nodeWrappedValue)
       }.mkString
     }
-
-    serialize(fullObjToMap)
+    if (typeTag.tpe.typeSymbol.name.toString == "Nothing" | typeTag.tpe.typeSymbol.name.toString == "String" | typeTag.tpe.typeSymbol.name.toString == "Elem"){
+      val fullObjToMap: Map[String, Any] = Map(objectToSerialize.getClass.getSimpleName.seq(0).toLower + objectToSerialize.getClass.getSimpleName.drop(1) -> objToMap(objectToSerialize))
+      val serializedXml: String = serialize(fullObjToMap)
+      if (typeTag.tpe.typeSymbol.name.toString == "Elem") Right(serializedXml.asInstanceOf[T])
+      else Right(scala.xml.XML.loadString(serializedXml).asInstanceOf[T])
+    }
+    else Left(s"Cannot decode into desired type: ${typeTag.tpe.typeSymbol.name}")
   }
 
   private def primitiveCheck(objToCheck: String): Boolean = {
+    //TODO Make sure there are no other primitives
     val primitive = List("String", "Int", "Integer", "Double", "Float", "Long", "Boolean")
     primitive.contains(objToCheck)
   }
 
-  def xmlDeserialize[T](xmlText: String): Either[String, T] = {
+  def xmlDeserialize[T](rawXml: String)(implicit typeTag: TypeTag[T]): Either[String, T] = {
 
-    //validate the xml string... which would look like what?
+    //TODO maybe throw a try around this and throw the error... don't know if that's how it happens yet though
+    val xml: Elem = scala.xml.XML.loadString(rawXml)
 
-    val xmlTextValidation = "(<.*/>|<.*>.*</.*>)".r.findFirstIn(xmlText)
+    def makeHappen(rawXml:String)(implicit typeTag: TypeTag[T]): List[Any] ={
+      val gg = typeTag.tpe.decls
+        .filter(param => "value [^_]\\S".r.findFirstIn(param.toString) match {
+          case Some(_) => true;
+          case None => false
+        })
+        .filterNot(param => param.name.toString.lastOption.getOrElse("") == ' ')
+        .map{param =>
+          if (primitiveCheck(param.typeSignature.typeSymbol.name.toString)){
+            param.typeSignature.typeSymbol.name.toString match {
+              case "Int" =>  (xml \ param.name.toString).text.toInt
+              case "String" =>  (xml \ param.name.toString).text
+              case "Double" =>  (xml \ param.name.toString).text.toDouble
+              case "Float" => (xml \ param.name.toString).text.toFloat
+              case "Long" => (xml \ param.name.toString).text.toLong
+              case "Boolean" => (xml \ param.name.toString).text.toBoolean
+              case "Option" => None
+            }
+          }
+          else{
+            makeHappen((xml \ param.name.toString).toString)
+          }
+        }.toList
+      gg
+    }
+
+    val mirror = ru.runtimeMirror(getClass.getClassLoader)
+    val clazz = mirror.staticClass(typeTag.tpe.toString)
+    val cm = mirror.reflectClass(clazz)
+    val constructor = clazz.primaryConstructor.asMethod
+    val constructorMirror = cm.reflectConstructor(constructor)
+    val instance = constructorMirror.apply(makeHappen(rawXml): _*)
+    println()
+
+    //figure out what is the top level list of values to find
     //
-    //    if (xmlTextValidation.getOrElse("").length == xmlText.length) Right(SimpleList("", List.empty, ""))
-    //    else
-    Left("Not a valid Xml String")
 
+
+    Right(instance.asInstanceOf[T])
   }
 
 }
