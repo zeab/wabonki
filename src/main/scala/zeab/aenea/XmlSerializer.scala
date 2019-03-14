@@ -88,6 +88,14 @@ object XmlSerializer {
     val xml: Elem = scala.xml.XML.loadString(rawXml)
 
     def makeHappen(rawXml:String)(implicit typeTag: TypeTag[T]): List[Any] ={
+      val qq = typeTag.tpe.decls
+        .filter(param => "value [^_]\\S".r.findFirstIn(param.toString) match {
+          case Some(_) => true;
+          case None => false
+        })
+        .filterNot(param => param.name.toString.lastOption.getOrElse("") == ' ')
+
+      qq.foreach(a => println(a.typeSignature.typeSymbol.name.toString))
       val gg = typeTag.tpe.decls
         .filter(param => "value [^_]\\S".r.findFirstIn(param.toString) match {
           case Some(_) => true;
@@ -103,8 +111,14 @@ object XmlSerializer {
               case "Float" => (xml \ param.name.toString).text.toFloat
               case "Long" => (xml \ param.name.toString).text.toLong
               case "Boolean" => (xml \ param.name.toString).text.toBoolean
-              case "Option" => None
             }
+          }
+          else if (param.typeSignature.typeSymbol.name.toString == "Option"){
+            //TODO Fix options so they actually return a value is there is one
+            None
+          }
+          else if (param.typeSignature.typeSymbol.name.toString == "List"){
+            List.empty
           }
           else{
             makeHappen((xml \ param.name.toString).toString)
