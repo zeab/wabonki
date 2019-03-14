@@ -88,14 +88,6 @@ object XmlSerializer {
     val xml: Elem = scala.xml.XML.loadString(rawXml)
 
     def makeHappen(rawXml:String)(implicit typeTag: TypeTag[T]): List[Any] ={
-      val qq = typeTag.tpe.decls
-        .filter(param => "value [^_]\\S".r.findFirstIn(param.toString) match {
-          case Some(_) => true;
-          case None => false
-        })
-        .filterNot(param => param.name.toString.lastOption.getOrElse("") == ' ')
-
-      qq.foreach(a => println(a.typeSignature.typeSymbol.name.toString))
       val gg = typeTag.tpe.decls
         .filter(param => "value [^_]\\S".r.findFirstIn(param.toString) match {
           case Some(_) => true;
@@ -115,14 +107,14 @@ object XmlSerializer {
           }
           else if (param.typeSignature.typeSymbol.name.toString == "Option"){
             //TODO Fix options so they actually return a value is there is one
+            //Maybe i need to unwrap it so that if its a primitive ill return that else ill keep unwrapping
             None
           }
           else if (param.typeSignature.typeSymbol.name.toString == "List"){
+            //How do i get myself a list of elem? so that i can apply those into the object at hand?
             List.empty
           }
-          else{
-            makeHappen((xml \ param.name.toString).toString)
-          }
+          else makeHappen((xml \ param.name.toString).toString)
         }.toList
       gg
     }
