@@ -10,49 +10,52 @@ class XmlSerializePrimitivesSpec extends FunSuite{
 
   test("Double Serialize") {
     val xml = xmlSerialize(MyDoubleClass(1.1))
-    assert(xml == "<myDoubleClass><myDouble>1.1</myDouble></myDoubleClass>")
+    assert(xml == validateXml("Double", 1.1.toString))
   }
 
   test("Float Serialize") {
     val xml = xmlSerialize(MyFloatClass(6.1F))
-    assert(xml == "<myFloatClass><myFloat>6.1</myFloat></myFloatClass>")
+    assert(xml == validateXml("Float", 6.1.toString))
   }
 
   test("Long Serialize") {
     val xml = xmlSerialize(MyLongClass(6L))
-    assert(xml == "<myLongClass><myLong>6</myLong></myLongClass>")
+    assert(xml == validateXml("Long", 6.toString))
   }
 
   test("Int Serialize") {
     val xml = xmlSerialize(MyIntClass(8))
-    assert(xml == "<myIntClass><myInt>8</myInt></myIntClass>")
+    assert(xml == validateXml("Int", 8.toString))
   }
 
   test("Short Serialize") {
     val xml = xmlSerialize(MyShortClass(8))
-    assert(xml == "<myShortClass><myShort>8</myShort></myShortClass>")
+    assert(xml == validateXml("Short", 8.toString))
   }
 
   test("Byte Serialize") {
     val xml = xmlSerialize(MyByteClass('c'.toByte))
-    assert(xml == "<myByteClass><myByte>99</myByte></myByteClass>")
+    assert(xml == validateXml("Byte", 'c'.toByte.toString))
   }
 
   test("Char Serialize") {
     val xml = xmlSerialize(MyCharClass('c'))
-    assert(xml == "<myCharClass><myChar>c</myChar></myCharClass>")
+    assert(xml == validateXml("Char", 'c'.toString))
   }
 
   test("Boolean Serialize") {
     val xml = xmlSerialize(MyBooleanClass(false))
-    assert(xml == "<myBooleanClass><myBoolean>false</myBoolean></myBooleanClass>")
+    assert(xml == validateXml("Boolean", false.toString))
   }
 
   test("String Serialize") {
     val xml = xmlSerialize(MyStringClass("llama"))
-    assert(xml == "<myStringClass><myString>llama</myString></myStringClass>")
+    assert(xml == validateXml("String", "llama"))
   }
 
-  //Unit...
+  //TODO Unit...
+
+  def validateXml(key:String, value:String): String =
+    s"<my${key}Class><my$key>$value</my$key></my${key}Class>"
 
 }
