@@ -11,6 +11,7 @@ import scala.xml.XML.loadString
 //TODO Come back to this ... https://www.tutorialspoint.com/scala/scala_data_types.htm
 object XmlSerializer {
 
+  //TODO Update this so it returns Either[Error, T] where T can be a String or Elem (Scala Xml)
   def xmlSerialize(input: Any): String = {
     //This is the bit when i already have the obj as an any where I loop though and check the types
     def serialize(obj: Any, paramName: String): String = {

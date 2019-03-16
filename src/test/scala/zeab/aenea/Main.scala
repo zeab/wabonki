@@ -5,6 +5,7 @@ import zeab.aenea.modelsfortest.singleclasses.primitives.{MyDoubleClass, MyFloat
 import io.circe.generic.auto._
 import io.circe.parser.decode
 import io.circe.syntax._
+import scala.xml.Elem
 
 object Main {
 
