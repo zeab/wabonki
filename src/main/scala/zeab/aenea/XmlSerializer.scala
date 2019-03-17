@@ -2,7 +2,7 @@ package zeab.aenea
 
 //Imports
 import scala.reflect.runtime.universe._
-import scala.reflect.runtime.{universe => ru}
+import scala.reflect.runtime.universe
 import scala.xml.Elem
 import scala.xml.XML.loadString
 
@@ -36,24 +36,22 @@ object XmlSerializer {
       val objInstance: InstanceMirror = mirror.reflect(input)
       //TODO Change this is its a little more selective when applying the _ removal filter for user defined case classes
       val objParams: Iterable[Symbol] = objType.decls
-        .filter(param => "value [^_]\\S".r.findFirstIn(param.toString) match {
-          case Some(_) => true;
-          case None => false
-        })
+        .filter(param => "value [^_]\\S".r.findFirstIn(param.toString) match {case Some(_) => true; case None => false})
         .filterNot(param => param.name.toString.lastOption.getOrElse("") == ' ')
-      val objValues: String = objParams
+      objParams
         .map { param => serialize(objInstance.reflectField(param.asTerm).get, param.name.toString) }
         .mkString
-      objValues
     }
     val objName: String = input.getClass.getSimpleName.seq(0).toLower + input.getClass.getSimpleName.drop(1)
     s"<$objName>${coreSerialize(input)}</$objName>"
   }
+
   //So at the end of the day all i need to do is a get a List[Any] of all the values inside that object and then
   //Apply it to a mirror of that object so it can be returned
   def xmlDeserialize[T](rawXml: String)(implicit typeTag: TypeTag[T]): Either[String, T] = {
+    //val mirror = ru.runtimeMirror(getClass.getClassLoader)
 
-    def deserialize(paramTypeName:String, paramName:String, xml:Elem): Any ={
+    def deserialize(param:Symbol, paramTypeName:String, paramName:String, xml:Elem): Any ={
       if (isPrimitive(paramTypeName)){
         paramTypeName match {
           case "Int" => (xml \ paramName).text.toInt
@@ -66,10 +64,25 @@ object XmlSerializer {
       }
       else if (paramTypeName == "Option"){
         //...now to know what its supposed to be...
-
-        None
+        val ww = param.typeSignature.toString.replace("=> Option[", "").replace("]", "")
+        if (ww == "Boolean"){
+          Some((xml \ paramName).text.toBoolean)
+        }
+        else{
+          //static cast this... so that I can get the types that I need and reflect on the right stuff
+          None
+        }
       }
       else if (paramTypeName == "List"){
+        val ww = param.typeSignature.toString.replace("=> List[", "").replace("]", "")
+
+        if(ww == "Boolean"){
+
+        }
+        else{
+
+        }
+        println()
         List.empty
       }
       else xmlDeserialize((xml \ paramName).toString)
@@ -93,7 +106,6 @@ object XmlSerializer {
     }
 
     val xml: Elem = loadString(rawXml)
-    val eee = (xml \\ "phoneNumber").map{_.toString}.toList
     val objParams = typeTag.tpe.decls
       .filter(param => "value [^_]\\S".r.findFirstIn(param.toString) match {
         case Some(_) => true
@@ -101,21 +113,19 @@ object XmlSerializer {
       })
       .filterNot(param => param.name.toString.lastOption.getOrElse("") == ' ')
       .map{param =>
-        showType(param.typeSignature)
-        println()
-        //deserialize(param.typeSignature.typeSymbol.name.toString, param.name.toString, xml)
-        ""
+        deserialize(param, param.typeSignature.typeSymbol.name.toString, param.name.toString, xml)
       }
       .toList
 
-    //TODO Clean this up...also add error checking
-    val mirror = ru.runtimeMirror(getClass.getClassLoader)
-    val clazz = mirror.staticClass(typeTag.tpe.toString)
-    val cm = mirror.reflectClass(clazz)
-    val constructor = clazz.primaryConstructor.asMethod
-    val constructorMirror = cm.reflectConstructor(constructor)
-    val instance = constructorMirror.apply{objParams: _*}
-    Right(instance.asInstanceOf[T])
+//    //TODO Clean this up...also add error checking
+//
+//    val clazz = mirror.staticClass(typeTag.tpe.toString)
+//    val cm = mirror.reflectClass(clazz)
+//    val constructor = clazz.primaryConstructor.asMethod
+//    val constructorMirror = cm.reflectConstructor(constructor)
+//    val instance = constructorMirror.apply{objParams: _*}
+//    Right(instance.asInstanceOf[T])
+    Left("")
   }
 
   def xmlDeserialize2[T](rawXml: String)(implicit typeTag: TypeTag[T]): Either[String, T] = {
@@ -156,13 +166,62 @@ object XmlSerializer {
       gg
     }
 
-    val mirror = ru.runtimeMirror(getClass.getClassLoader)
+//    val mirror = ru.runtimeMirror(getClass.getClassLoader)
+//    val clazz = mirror.staticClass(typeTag.tpe.toString)
+//    val cm = mirror.reflectClass(clazz)
+//    val constructor = clazz.primaryConstructor.asMethod
+//    val constructorMirror = cm.reflectConstructor(constructor)
+//    val instance = constructorMirror.apply(makeHappen(rawXml): _*)
+//    Right(instance.asInstanceOf[T])
+    Left("")
+  }
+
+  def xmlDes[T](rawXml: String)(implicit typeTag: TypeTag[T]): T = {
+    val mirror: Mirror = runtimeMirror(getClass.getClassLoader)
+    def deserialize(): Any ={
+
+    }
+    //TODO make this conversion safer
+    val xml: Elem = loadString(rawXml)
+    val objValues = typeTag.tpe.decls
+      .filter(param => "value [^_]\\S".r.findFirstIn(param.toString) match {
+        case Some(_) => true
+        case None => false
+      })
+      .filterNot(param => param.name.toString.lastOption.getOrElse("") == ' ')
+      .map{param =>
+        val gg = "\\[(.*?)\\]".r.findFirstIn(param.typeSignature.resultType.toString)
+        val ew = param.typeSignature.resultType.toString.split("\\[(.*?)\\]")
+        if(isPrimitive(param.typeSignature.resultType.toString)){
+          param.typeSignature.resultType.toString match {
+            case "Int" => (xml \ param.name.toString).text.toInt
+            case "String" => (xml \ param.name.toString).text
+            case "Double" => (xml \ param.name.toString).text.toDouble
+            case "Float" => (xml \ param.name.toString).text.toFloat
+            case "Long" => (xml \ param.name.toString).text.toLong
+            case "Boolean" => (xml \ param.name.toString).text.toBoolean
+          }
+        }
+        else if(param.typeSignature.resultType.toString.replace("[.]", "") == "List"){
+
+          "List[zeab.aenea.modelsfortest.complexclasses.PhoneNumber]"
+          ""
+        }
+        else if(param.typeSignature.resultType.toString.replace("[.*]", "") == "Option"){
+
+          ""
+        }
+        else{
+          ""
+        }
+      }.toList
+
     val clazz = mirror.staticClass(typeTag.tpe.toString)
     val cm = mirror.reflectClass(clazz)
     val constructor = clazz.primaryConstructor.asMethod
     val constructorMirror = cm.reflectConstructor(constructor)
-    val instance = constructorMirror.apply(makeHappen(rawXml): _*)
-    Right(instance.asInstanceOf[T])
+    val instance = constructorMirror.apply(objValues: _*)
+    instance.asInstanceOf[T]
   }
 
   private def isPrimitive(nameToCheck: String): Boolean = {
