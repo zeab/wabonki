@@ -13,36 +13,87 @@ object XmlSerializer {
 
   //TODO Update this so it returns Either[Error, T] where T can be a String or Elem (Scala Xml)
   def xmlSerialize(input: Any): String = {
-    //This is the bit when i already have the obj as an any where I loop though and check the types
-    def serialize(obj: Any, paramName: String): String = {
-      val objName: String = obj.getClass.getSimpleName
-      if (isPrimitive(objName)) s"<$paramName>$obj</$paramName>"
-      else if (objName == "$colon$colon") obj.asInstanceOf[List[Any]].map { node => serialize(node, paramName) }.mkString
-      else if (objName == "Some" | objName == "None$")
-        obj.asInstanceOf[Option[Any]] match {
-          case Some(actualValue) => serialize(actualValue, paramName)
-          case None => s"<$paramName/>"
+    val mirror: Mirror = runtimeMirror(getClass.getClassLoader)
+    def coreSerialize(input: Any): String = {
+      //This is the bit when i already have the obj as an any where I loop though and check the types
+      def serialize(obj: Any, paramName: String): String = {
+        val objName: String = obj.getClass.getSimpleName
+        if (isPrimitive(objName)) s"<$paramName>$obj</$paramName>"
+        else if (objName == "$colon$colon") obj.asInstanceOf[List[Any]].map { node =>
+          val nodeType: String = node.getClass.getSimpleName
+          if (isPrimitive(nodeType)) serialize(node, paramName)
+          else s"<$paramName>${serialize(node, paramName)}</$paramName>"
+        }.mkString
+        else if (objName == "Some" | objName == "None$")
+          obj.asInstanceOf[Option[Any]] match {
+            case Some(actualValue) => serialize(actualValue, paramName)
+            case None => s"<$paramName/>"
+          }
+        else coreSerialize(obj)
+      }
+
+      val objType: Type = mirror.classSymbol(input.getClass).toType
+      val objInstance: InstanceMirror = mirror.reflect(input)
+      //TODO Change this is its a little more selective when applying the _ removal filter for user defined case classes
+      val objParams: Iterable[Symbol] = objType.decls
+        .filter(param => "value [^_]\\S".r.findFirstIn(param.toString) match {
+          case Some(_) => true;
+          case None => false
+        })
+        .filterNot(param => param.name.toString.lastOption.getOrElse("") == ' ')
+      val objValues: String = objParams
+        .map { param => serialize(objInstance.reflectField(param.asTerm).get, param.name.toString) }
+        .mkString
+      objValues
+    }
+    val objName: String = input.getClass.getSimpleName.seq(0).toLower + input.getClass.getSimpleName.drop(1)
+    s"<$objName>${coreSerialize(input)}</$objName>"
+  }
+  //So at the end of the day all i need to do is a get a List[Any] of all the values inside that object and then
+  //Apply it to a mirror of that object so it can be returned
+  def xmlDeserialize[T](rawXml: String)(implicit typeTag: TypeTag[T]): Either[String, T] = {
+
+    def deserialize(paramTypeName:String, paramName:String, xml:Elem): Any ={
+      if (isPrimitive(paramTypeName)){
+        paramTypeName match {
+          case "Int" => (xml \ paramName).text.toInt
+          case "String" => (xml \ paramName).text
+          case "Double" => (xml \ paramName).text.toDouble
+          case "Float" => (xml \ paramName).text.toFloat
+          case "Long" => (xml \ paramName).text.toLong
+          case "Boolean" => (xml \ paramName).text.toBoolean
         }
-      else xmlSerialize(obj)
+      }
+      else if (paramTypeName == "Option"){
+        //...now to know what its supposed to be...
+
+        None
+      }
+      else if (paramTypeName == "List"){
+        List.empty
+      }
+      else xmlDeserialize((xml \ paramName).toString)
+    }
+    def showType(t: Type): Unit = {
+      if( t.typeSymbol.fullName.toString == "scala.collection.immutable.List" ) {
+        val ww = t
+        t match {
+          case PolyType(typeParams, resultType) =>
+            println(s"poly $typeParams, $resultType")
+          case TypeRef(pre, sym, args) =>
+            println(s"typeref $pre, $sym, $args")
+            val subtype = args(0)
+            println("Sub:"+subtype)
+            showType(subtype.typeSymbol.typeSignature)
+            showType(subtype)
+          case _ => println("nothing")
+        }
+      }
+      else println(t.typeSymbol.fullName)
     }
 
-    val mirror: Mirror = runtimeMirror(getClass.getClassLoader)
-    val objType: Type = mirror.classSymbol(input.getClass).toType
-    val objInstance: InstanceMirror = mirror.reflect(input)
-    //TODO Change this is its a little more selective when applying the _ removal filter for user defined case classes
-    val objParams: Iterable[Symbol] = objType.decls
-      .filter(param => "value [^_]\\S".r.findFirstIn(param.toString) match {
-        case Some(_) => true;
-        case None => false
-      })
-      .filterNot(param => param.name.toString.lastOption.getOrElse("") == ' ')
-    val objName: String = input.getClass.getSimpleName.seq(0).toLower + input.getClass.getSimpleName.drop(1)
-    val objValues: String = objParams.map { param => serialize(objInstance.reflectField(param.asTerm).get, param.name.toString)}.mkString
-    s"<$objName>$objValues</$objName>"
-  }
-
-  def xmlDeserialize[T](rawXml: String)(implicit typeTag: TypeTag[T]): Either[String, T] = {
     val xml: Elem = loadString(rawXml)
+    val eee = (xml \\ "phoneNumber").map{_.toString}.toList
     val objParams = typeTag.tpe.decls
       .filter(param => "value [^_]\\S".r.findFirstIn(param.toString) match {
         case Some(_) => true
@@ -50,16 +101,20 @@ object XmlSerializer {
       })
       .filterNot(param => param.name.toString.lastOption.getOrElse("") == ' ')
       .map{param =>
-        val ee = param.asClass.getClass.getSimpleName
-        param
+        showType(param.typeSignature)
+        println()
+        //deserialize(param.typeSignature.typeSymbol.name.toString, param.name.toString, xml)
+        ""
       }
+      .toList
+
     //TODO Clean this up...also add error checking
     val mirror = ru.runtimeMirror(getClass.getClassLoader)
     val clazz = mirror.staticClass(typeTag.tpe.toString)
     val cm = mirror.reflectClass(clazz)
     val constructor = clazz.primaryConstructor.asMethod
     val constructorMirror = cm.reflectConstructor(constructor)
-    val instance = constructorMirror.apply{List.empty: _*}
+    val instance = constructorMirror.apply{objParams: _*}
     Right(instance.asInstanceOf[T])
   }
 

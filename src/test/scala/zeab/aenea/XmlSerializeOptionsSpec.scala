@@ -6,7 +6,7 @@ import zeab.aenea.modelsfortest.singleclasses.options._
 //ScalaTest
 import org.scalatest.FunSuite
 
-class XmlSerializeOptionSpec extends FunSuite {
+class XmlSerializeOptionsSpec extends FunSuite {
 
   test("Option: None Serialize") {
     val xml = xmlSerialize(MyOptionStringClass(None))
