@@ -3,6 +3,7 @@ package zeab.aenea.serialize
 //Imports
 import zeab.aenea.XmlSerializer._
 import zeab.aenea.modelsfortest.complexclasses.{Horse, Item, Person}
+import zeab.aenea.modelsfortest.singleclasses.options.MyOptionListClass
 //ScalaTest
 import org.scalatest.FunSuite
 

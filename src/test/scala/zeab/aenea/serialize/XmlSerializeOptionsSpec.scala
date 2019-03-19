@@ -6,6 +6,7 @@ import zeab.aenea.modelsfortest.singleclasses.options._
 //ScalaTest
 import org.scalatest.FunSuite
 
+//TODO Unit...and other various lesser used types for case classes like this...
 class XmlSerializeOptionsSpec extends FunSuite {
 
   test("Option: None Serialize") {
@@ -58,7 +59,12 @@ class XmlSerializeOptionsSpec extends FunSuite {
     assert(xml == validateXml("Short", 1.toString))
   }
 
-  //TODO Unit...
+  test("Option: List[Any] Serialize") {
+    val obj: MyOptionListClass = MyOptionListClass(Some(List(9, "llama")))
+    val serializedXml: String = xmlSerialize(obj)
+    val expectedXml: String = "<myOptionListClass><myOptionList>9</myOptionList><myOptionList>llama</myOptionList></myOptionListClass>"
+    assert(serializedXml == expectedXml)
+  }
 
   def validateXml(key: String, value: String): String =
     s"<myOption${key}Class><myOption$key>$value</myOption$key></myOption${key}Class>"

@@ -10,6 +10,7 @@ import scala.xml.XML.loadString
 //TODO Think about how to handle Either (if its a right maybe treat it as a value and left treat it as None? or maybe String?)
 //TODO Come back to this ... https://www.tutorialspoint.com/scala/scala_data_types.htm
 //TODO https://www.cs.helsinki.fi/u/wikla/OTS/Sisalto/examples/html/ch26.html
+//TODO Decide what to do about empty value inside a list... do I return a blank... or do I shorten the returned list by 1
 object XmlSerializer {
 
   //TODO Update this so it returns Either[Error, T] where T can be a String or Elem (Scala Xml)
@@ -66,25 +67,25 @@ object XmlSerializer {
     val reflectedValue: List[Any] =
       reflectedType.decls
         .filter(param => "value [^_]\\S".r.findFirstIn(param.toString) match {
-          case Some(_) => true;
+          case Some(_) => true
           case None => false
         })
         .filterNot(param => param.name.toString.lastOption.getOrElse("") == ' ')
         .map { param =>
-          val (paramName, paramTypes) = getSymbolInfo(param)
+          val (paramName, paramTypes): (String, List[String]) = getSymbolInfo(param)
           coreDeserialize(paramName, paramTypes, xml)
         }
         .toList
-    val classMirror = mirror.reflectClass(reflectedClass)
-    val constructor = reflectedClass.primaryConstructor.asMethod
-    val constructorMirror = classMirror.reflectConstructor(constructor)
-    val instance = constructorMirror.apply(reflectedValue: _*)
+    val classMirror: ClassMirror = mirror.reflectClass(reflectedClass)
+    val constructor: MethodSymbol = reflectedClass.primaryConstructor.asMethod
+    val constructorMirror: MethodMirror = classMirror.reflectConstructor(constructor)
+    val instance: Any = constructorMirror.apply(reflectedValue: _*)
     instance
   }
 
   private def coreDeserialize(paramName: String, paramTypes: List[String], xml: Elem)(implicit mirror: Mirror): Any = {
     paramTypes.headOption.getOrElse("") match {
-      case "String" => (xml \ paramName).text
+      case "String" | "Any" => (xml \ paramName).text
       case "Char" =>
         //TODO Check up on char
         //This may or may not be right... but...idk if its every used by anyone so low pri
@@ -132,10 +133,10 @@ object XmlSerializer {
           case Failure(_) => ""
         }
       case "List" =>
-        val wholeNode: NodeSeq = xml \ paramName
-        if(wholeNode.toString == s"<$paramName/>") List.empty
+        val nodes: NodeSeq = xml \ paramName
+        if(nodes.toString == s"<$paramName/>") List.empty
         else
-          wholeNode.map { node =>
+          nodes.map { node =>
             //Have to add a root tag so that it can be "found" inside the xml... the text is irrelevant existence is all that matters
             coreDeserialize(paramName, paramTypes.drop(1), <root>{node.asInstanceOf[Elem]}</root>)
           }.toList
@@ -143,7 +144,7 @@ object XmlSerializer {
         val optionValue: Any = coreDeserialize(paramName, paramTypes.drop(1), xml)
         if (optionValue == "") None
         else Some(optionValue)
-      case "Any" | "Unit" | "Either" => "Error!! Unsupported Type"
+      case "Unit" | "Either" => "Error!! Unsupported Type"
       case "" => "ERROR!"
       case _ => deserialize(paramTypes, loadString((xml \ paramName).toString))
     }
