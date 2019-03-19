@@ -2,21 +2,61 @@ package zeab.aenea.serialize
 
 //Imports
 import zeab.aenea.XmlSerializer._
-import zeab.aenea.modelsfortest.complexclasses.gameconsole.{Game, GameConsole}
-import zeab.aenea.modelsfortest.singleclasses.collections.lists.MyListDoubleClass
+import zeab.aenea.modelsfortest.singleclasses.collections.lists._
 //ScalaTest
 import org.scalatest.FunSuite
 
 class XmlSerializeListsSpec extends FunSuite {
 
   test("List: Double Serialize") {
-    val xml = xmlSerialize(MyListDoubleClass(List(1.0, 5.3, 7, 3, 2.1)))
-    assert(xml == "<myListDoubleClass><myListDouble>1.0</myListDouble><myListDouble>5.3</myListDouble><myListDouble>7.0</myListDouble><myListDouble>3.0</myListDouble><myListDouble>2.1</myListDouble></myListDoubleClass>")
+    val theList: List[Double] = List(1.0, 5.3, 7, 3, 2.1)
+    val obj: MyListDoubleClass = MyListDoubleClass(theList)
+    val serializedXml: String = xmlSerialize(obj)
+    val expectedXml = validateXml("ListDouble", theList)
+    assert(serializedXml == expectedXml)
   }
 
-  test("List: GameConsole Serialize") {
-    val xml = xmlSerialize(GameConsole("xbox", List(Game("halo", 0), Game("division", 6), Game("other", 2))))
-    assert(xml == "<gameConsole><name>xbox</name><games><name>halo</name><level>0</level></games><games><name>division</name><level>6</level></games><games><name>other</name><level>2</level></games></gameConsole>")
+  test("List: Int Serialize") {
+    val theList: List[Int] = List(1, 5, 7, 3, 2)
+    val obj: MyListIntClass = MyListIntClass(theList)
+    val serializedXml: String = xmlSerialize(obj)
+    val expectedXml = validateXml("ListInt", theList)
+    assert(serializedXml == expectedXml)
   }
+
+  test("List: String Serialize") {
+    val theList: List[String] = List("llama", "panda", "bert")
+    val obj: MyListStringClass = MyListStringClass(theList)
+    val serializedXml: String = xmlSerialize(obj)
+    val expectedXml = validateXml("ListString", theList)
+    assert(serializedXml == expectedXml)
+  }
+
+  test("List: Long Serialize") {
+    val theList: List[Long] = List(5L, 6L, 7L)
+    val obj: MyListLongClass = MyListLongClass(theList)
+    val serializedXml: String = xmlSerialize(obj)
+    val expectedXml = validateXml("ListLong", theList)
+    assert(serializedXml == expectedXml)
+  }
+
+  test("List: Boolean Serialize") {
+    val theList: List[Boolean] = List(false, false, true)
+    val obj: MyListBooleanClass = MyListBooleanClass(theList)
+    val serializedXml: String = xmlSerialize(obj)
+    val expectedXml = validateXml("ListBoolean", theList)
+    assert(serializedXml == expectedXml)
+  }
+
+  test("List: Short Serialize") {
+    val theList: List[Short] = List(4, 1, 22)
+    val obj: MyListShortClass = MyListShortClass(theList)
+    val serializedXml: String = xmlSerialize(obj)
+    val expectedXml = validateXml("ListShort", theList)
+    assert(serializedXml == expectedXml)
+  }
+
+  def validateXml(key: String, values:List[Any]): String =
+    s"<my${key}Class>${values.map{value =>s"<my$key>$value</my$key>"}.mkString}</my${key}Class>"
 
 }

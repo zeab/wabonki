@@ -3,7 +3,7 @@ package zeab.aenea
 //Imports
 import scala.reflect.runtime.universe._
 import scala.util.{Failure, Success, Try}
-import scala.xml.Elem
+import scala.xml.{Elem, NodeSeq}
 import scala.xml.XML.loadString
 
 //TODO Think about how to handle Unit (maybe just treat it as an None...?)
@@ -25,6 +25,22 @@ object XmlSerializer {
     deserialize(List(typeTag.tpe.toString), xml).asInstanceOf[T]
   }
 
+  private def serialize(input: Any)(implicit mirror: Mirror): String = {
+    //This is the bit when i already have the obj as an any where I loop though and check the types
+    val objType: Type = mirror.classSymbol(input.getClass).toType
+    val objInstance: InstanceMirror = mirror.reflect(input)
+    //TODO Change this is its a little more selective when applying the _ removal filter for user defined case classes
+    val objParams: Iterable[Symbol] = objType.decls
+      .filter(param => "value [^_]\\S".r.findFirstIn(param.toString) match {
+        case Some(_) => true;
+        case None => false
+      })
+      .filterNot(param => param.name.toString.lastOption.getOrElse("") == ' ')
+    objParams
+      .map { param => coreSerialize(objInstance.reflectField(param.asTerm).get, param.name.toString) }
+      .mkString
+  }
+
   private def coreSerialize(obj: Any, paramName: String)(implicit mirror: Mirror): String = {
     val objName: String = obj.getClass.getSimpleName
     if (isPrimitive(objName)) s"<$paramName>$obj</$paramName>"
@@ -41,22 +57,6 @@ object XmlSerializer {
       if (isPrimitive(nodeType)) coreSerialize(obj, paramName)
       else s"<$paramName>${serialize(obj)}</$paramName>"
     }
-  }
-
-  private def serialize(input: Any)(implicit mirror: Mirror): String = {
-    //This is the bit when i already have the obj as an any where I loop though and check the types
-    val objType: Type = mirror.classSymbol(input.getClass).toType
-    val objInstance: InstanceMirror = mirror.reflect(input)
-    //TODO Change this is its a little more selective when applying the _ removal filter for user defined case classes
-    val objParams: Iterable[Symbol] = objType.decls
-      .filter(param => "value [^_]\\S".r.findFirstIn(param.toString) match {
-        case Some(_) => true;
-        case None => false
-      })
-      .filterNot(param => param.name.toString.lastOption.getOrElse("") == ' ')
-    objParams
-      .map { param => coreSerialize(objInstance.reflectField(param.asTerm).get, param.name.toString) }
-      .mkString
   }
 
   private def deserialize(typeNames: List[String], xml: Elem)(implicit mirror: Mirror): Any = {
@@ -132,19 +132,17 @@ object XmlSerializer {
           case Failure(_) => ""
         }
       case "List" =>
-        //Have to add a root tag so that it can be "found" inside the xml
-        (xml \ paramName).map { node =>
-          coreDeserialize(paramName, paramTypes.drop(1), <root>
-            {node.asInstanceOf[Elem]}
-          </root>)
-        }.toList
+        val wholeNode: NodeSeq = xml \ paramName
+        if(wholeNode.toString == s"<$paramName/>") List.empty
+        else
+          wholeNode.map { node =>
+            //Have to add a root tag so that it can be "found" inside the xml... the text is irrelevant existence is all that matters
+            coreDeserialize(paramName, paramTypes.drop(1), <root>{node.asInstanceOf[Elem]}</root>)
+          }.toList
       case "Option" =>
-        val paramXml: String = (xml \ paramName).toString
-        //Check to make sure its not just an empty node and short circuit any further checks
-        "<.*/>".r.findFirstIn(paramXml) match {
-          case Some(_) => None
-          case None => Some(coreDeserialize(paramName, paramTypes.drop(1), xml))
-        }
+        val optionValue: Any = coreDeserialize(paramName, paramTypes.drop(1), xml)
+        if (optionValue == "") None
+        else Some(optionValue)
       case "Any" | "Unit" | "Either" => "Error!! Unsupported Type"
       case "" => "ERROR!"
       case _ => deserialize(paramTypes, loadString((xml \ paramName).toString))

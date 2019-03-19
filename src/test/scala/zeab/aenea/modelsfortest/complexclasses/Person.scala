@@ -1,4 +1,4 @@
-package zeab.aenea.modelsfortest.complexclasses.person
+package zeab.aenea.modelsfortest.complexclasses
 
 case class Person(
                    name: String,
@@ -7,5 +7,6 @@ case class Person(
                    health: Double,
                    soulStone: Option[Boolean],
                    mount: Option[Horse],
-                   backpack: List[Item]
+                   backpack: List[Item],
+                   previousDestinations:List[String]
                  )
