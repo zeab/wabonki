@@ -1,8 +1,8 @@
-package zeab.aenea
+package zeab.aenea.serialize
 
 //Imports
 import zeab.aenea.XmlSerializer._
-import zeab.aenea.modelsfortest.complexclasses.{Game, GameConsole}
+import zeab.aenea.modelsfortest.complexclasses.gameconsole.{Game, GameConsole}
 import zeab.aenea.modelsfortest.singleclasses.collections.lists.MyListDoubleClass
 //ScalaTest
 import org.scalatest.FunSuite

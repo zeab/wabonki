@@ -1,4 +1,4 @@
-package zeab.aenea
+package zeab.aenea.serialize
 
 //Imports
 import zeab.aenea.XmlSerializer._
