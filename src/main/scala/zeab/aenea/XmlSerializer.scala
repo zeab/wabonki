@@ -16,7 +16,7 @@ object XmlSerializer {
   def xmlSerialize(input: Any): String = {
     implicit val mirror: Mirror = runtimeMirror(getClass.getClassLoader)
     val objName: String = input.getClass.getSimpleName.seq(0).toLower + input.getClass.getSimpleName.drop(1)
-    s"<$objName>${coreSerialize(input)}</$objName>"
+    s"<$objName>${serialize(input)}</$objName>"
   }
 
   def xmlDeserialize[T](input: String)(implicit typeTag: TypeTag[T]): T = {
@@ -25,25 +25,25 @@ object XmlSerializer {
     deserialize(List(typeTag.tpe.toString), xml).asInstanceOf[T]
   }
 
-  private def serialize(obj: Any, paramName: String)(implicit mirror: Mirror): String = {
+  private def coreSerialize(obj: Any, paramName: String)(implicit mirror: Mirror): String = {
     val objName: String = obj.getClass.getSimpleName
     if (isPrimitive(objName)) s"<$paramName>$obj</$paramName>"
     else if (objName == "$colon$colon") obj.asInstanceOf[List[Any]].map { node =>
-      serialize(node, paramName)
+      coreSerialize(node, paramName)
     }.mkString
     else if (objName == "Some" | objName == "None$")
       obj.asInstanceOf[Option[Any]] match {
-        case Some(actualValue) => serialize(actualValue, paramName)
+        case Some(actualValue) => coreSerialize(actualValue, paramName)
         case None => s"<$paramName/>"
       }
     else {
       val nodeType: String = obj.getClass.getSimpleName
-      if (isPrimitive(nodeType)) serialize(obj, paramName)
-      else s"<$paramName>${coreSerialize(obj)}</$paramName>"
+      if (isPrimitive(nodeType)) coreSerialize(obj, paramName)
+      else s"<$paramName>${serialize(obj)}</$paramName>"
     }
   }
 
-  private def coreSerialize(input: Any)(implicit mirror: Mirror): String = {
+  private def serialize(input: Any)(implicit mirror: Mirror): String = {
     //This is the bit when i already have the obj as an any where I loop though and check the types
     val objType: Type = mirror.classSymbol(input.getClass).toType
     val objInstance: InstanceMirror = mirror.reflect(input)
@@ -55,7 +55,7 @@ object XmlSerializer {
       })
       .filterNot(param => param.name.toString.lastOption.getOrElse("") == ' ')
     objParams
-      .map { param => serialize(objInstance.reflectField(param.asTerm).get, param.name.toString) }
+      .map { param => coreSerialize(objInstance.reflectField(param.asTerm).get, param.name.toString) }
       .mkString
   }
 
@@ -145,6 +145,7 @@ object XmlSerializer {
           case Some(_) => None
           case None => Some(coreDeserialize(paramName, paramTypes.drop(1), xml))
         }
+      case "Any" | "Unit" | "Either" => "Error!! Unsupported Type"
       case "" => "ERROR!"
       case _ => deserialize(paramTypes, loadString((xml \ paramName).toString))
     }
