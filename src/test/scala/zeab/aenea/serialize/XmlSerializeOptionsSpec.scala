@@ -60,7 +60,7 @@ class XmlSerializeOptionsSpec extends FunSuite {
 
   //TODO Unit...
 
-  def validateXml(key:String, value:String): String =
+  def validateXml(key: String, value: String): String =
     s"<myOption${key}Class><myOption$key>$value</myOption$key></myOption${key}Class>"
 
 }

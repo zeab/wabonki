@@ -1,3 +1,3 @@
 package zeab.aenea.modelsfortest.singleclasses.primitives
 
-case class MyCharClass(myChar:Char)
+case class MyCharClass(myChar: Char)

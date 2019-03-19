@@ -6,7 +6,7 @@ import zeab.aenea.modelsfortest.singleclasses.primitives._
 //ScalaTest
 import org.scalatest.FunSuite
 
-class XmlSerializePrimitivesSpec extends FunSuite{
+class XmlSerializePrimitivesSpec extends FunSuite {
 
   test("Double Serialize") {
     val xml = xmlSerialize(MyDoubleClass(1.1))
@@ -55,7 +55,7 @@ class XmlSerializePrimitivesSpec extends FunSuite{
 
   //TODO Unit...
 
-  def validateXml(key:String, value:String): String =
+  def validateXml(key: String, value: String): String =
     s"<my${key}Class><my$key>$value</my$key></my${key}Class>"
 
 }

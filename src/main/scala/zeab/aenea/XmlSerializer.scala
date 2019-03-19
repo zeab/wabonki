@@ -2,10 +2,9 @@ package zeab.aenea
 
 //Imports
 import scala.reflect.runtime.universe._
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 import scala.xml.Elem
 import scala.xml.XML.loadString
-import scala.util.Try
 
 //TODO Think about how to handle Unit (maybe just treat it as an None...?)
 //TODO Think about how to handle Either (if its a right maybe treat it as a value and left treat it as None? or maybe String?)
@@ -20,7 +19,7 @@ object XmlSerializer {
     s"<$objName>${coreSerialize(input)}</$objName>"
   }
 
-  def xmlDeserialize[T](input: String)(implicit typeTag: TypeTag[T]): T ={
+  def xmlDeserialize[T](input: String)(implicit typeTag: TypeTag[T]): T = {
     implicit val mirror: Mirror = runtimeMirror(getClass.getClassLoader)
     val xml: Elem = loadString(input)
     deserialize(List(typeTag.tpe.toString), xml).asInstanceOf[T]
@@ -37,7 +36,7 @@ object XmlSerializer {
         case Some(actualValue) => serialize(actualValue, paramName)
         case None => s"<$paramName/>"
       }
-    else{
+    else {
       val nodeType: String = obj.getClass.getSimpleName
       if (isPrimitive(nodeType)) serialize(obj, paramName)
       else s"<$paramName>${coreSerialize(obj)}</$paramName>"
@@ -50,22 +49,28 @@ object XmlSerializer {
     val objInstance: InstanceMirror = mirror.reflect(input)
     //TODO Change this is its a little more selective when applying the _ removal filter for user defined case classes
     val objParams: Iterable[Symbol] = objType.decls
-      .filter(param => "value [^_]\\S".r.findFirstIn(param.toString) match {case Some(_) => true; case None => false})
+      .filter(param => "value [^_]\\S".r.findFirstIn(param.toString) match {
+        case Some(_) => true;
+        case None => false
+      })
       .filterNot(param => param.name.toString.lastOption.getOrElse("") == ' ')
     objParams
       .map { param => serialize(objInstance.reflectField(param.asTerm).get, param.name.toString) }
       .mkString
   }
 
-  private def deserialize(typeNames:List[String], xml:Elem)(implicit mirror: Mirror): Any ={
+  private def deserialize(typeNames: List[String], xml: Elem)(implicit mirror: Mirror): Any = {
     //TODO FIx this head so that if you get a "" back you error out
     val reflectedClass: ClassSymbol = mirror.staticClass(typeNames.head)
     val reflectedType: Type = reflectedClass.typeSignature
     val reflectedValue: List[Any] =
       reflectedType.decls
-        .filter(param => "value [^_]\\S".r.findFirstIn(param.toString) match {case Some(_) => true; case None => false})
+        .filter(param => "value [^_]\\S".r.findFirstIn(param.toString) match {
+          case Some(_) => true;
+          case None => false
+        })
         .filterNot(param => param.name.toString.lastOption.getOrElse("") == ' ')
-        .map{param =>
+        .map { param =>
           val (paramName, paramTypes) = getSymbolInfo(param)
           coreDeserialize(paramName, paramTypes, xml)
         }
@@ -77,9 +82,40 @@ object XmlSerializer {
     instance
   }
 
-  private def coreDeserialize(paramName:String, paramTypes:List[String], xml:Elem)(implicit mirror: Mirror): Any ={
+  private def coreDeserialize(paramName: String, paramTypes: List[String], xml: Elem)(implicit mirror: Mirror): Any = {
     paramTypes.headOption.getOrElse("") match {
       case "String" => (xml \ paramName).text
+      case "Char" =>
+        //TODO Check up on char
+        //This may or may not be right... but...idk if its every used by anyone so low pri
+        Try((xml \ paramName).text.headOption.getOrElse(' ')) match {
+          case Success(value) =>
+            value match {
+              case ' ' => value
+              case _ => 'E'
+            }
+          case Failure(_) => ' '
+        }
+      case "Byte" =>
+        Try((xml \ paramName).text.toByte) match {
+          case Success(value) => value
+          case Failure(_) => ""
+        }
+      case "Float" =>
+        Try((xml \ paramName).text.toFloat) match {
+          case Success(value) => value
+          case Failure(_) => ""
+        }
+      case "Long" =>
+        Try((xml \ paramName).text.toLong) match {
+          case Success(value) => value
+          case Failure(_) => ""
+        }
+      case "Short" =>
+        Try((xml \ paramName).text.toShort) match {
+          case Success(value) => value
+          case Failure(_) => ""
+        }
       case "Double" =>
         Try((xml \ paramName).text.toDouble) match {
           case Success(value) => value
@@ -97,8 +133,10 @@ object XmlSerializer {
         }
       case "List" =>
         //Have to add a root tag so that it can be "found" inside the xml
-        (xml \ paramName).map{node =>
-          coreDeserialize(paramName, paramTypes.drop(1), <root>{node.asInstanceOf[Elem]}</root>)
+        (xml \ paramName).map { node =>
+          coreDeserialize(paramName, paramTypes.drop(1), <root>
+            {node.asInstanceOf[Elem]}
+          </root>)
         }.toList
       case "Option" =>
         val paramXml: String = (xml \ paramName).toString
@@ -115,7 +153,7 @@ object XmlSerializer {
   //Helpers below here
   //TODO Change this so that it only returns 0 1 or 2
   //so that it only splits it on the first [ for the types so that the loops will drop though correctly
-  private def getSymbolInfo(symbol:Symbol): (String, List[String]) = {
+  private def getSymbolInfo(symbol: Symbol): (String, List[String]) = {
     val paramName: String = symbol.name.toString
     val paramTypes: List[String] = symbol.typeSignature.resultType.toString
       .split("\\[")

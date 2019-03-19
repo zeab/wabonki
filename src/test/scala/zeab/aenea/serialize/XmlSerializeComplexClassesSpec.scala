@@ -8,11 +8,14 @@ import org.scalatest.FunSuite
 
 class XmlSerializeComplexClassesSpec extends FunSuite {
 
-  //TODO Update the results so they are actually correct...
-  test("List: Person Serialize") {
-    //val xml = xmlSerialize(Person("bob", "warlock", 10, List(Item("sword", "attack"), Item("shield", "defence")), Some(7)))
-    //assert(xml == "<person><name>bob</name><class>warlock</class><level>10</level><backpack><name>sword</name><type>attack</type></backpack><backpack><name>shield</name><type>defence</type></backpack><mount><name>bert</name><speed>1.5</speed></mount></person>")
-    assert(false)
+  test("Person Serialize") {
+    val mount: Horse = Horse("daisy", 1.4)
+    val backpack: List[Item] = List(Item("sword", "attack"), Item("shield", "defense"))
+    val person: Person = Person("bob", "warlock", 9, 87.3, None, Some(mount), backpack)
+    val obj = person
+    val serializedXml: String = xmlSerialize(obj)
+    val expectedXml: String = "<person><name>bob</name><class>warlock</class><level>9</level><health>87.3</health><soulStone/><mount><name>daisy</name><speed>1.4</speed></mount><backpack><name>sword</name><type>attack</type></backpack><backpack><name>shield</name><type>defense</type></backpack></person>"
+    assert(serializedXml == expectedXml)
   }
 
 }

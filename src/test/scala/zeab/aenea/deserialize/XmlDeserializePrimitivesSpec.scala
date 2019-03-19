@@ -6,7 +6,7 @@ import zeab.aenea.modelsfortest.singleclasses.primitives._
 //ScalaTest
 import org.scalatest.FunSuite
 
-class XmlDeserializePrimitivesSpec extends FunSuite{
+class XmlDeserializePrimitivesSpec extends FunSuite {
 
   test("Double Deserialize") {
     val expectedType: String = "MyDoubleClass"
@@ -16,7 +16,7 @@ class XmlDeserializePrimitivesSpec extends FunSuite{
   }
 
   test("Float Deserialize") {
-    val expectedType: String = "MyDoubleClass"
+    val expectedType: String = "MyFloatClass"
     val xml: String = makeValidXml("Float", 6.1.toString)
     val deserialize: MyFloatClass = xmlDeserialize[MyFloatClass](xml)
     assert(expectedType == deserialize.getClass.getSimpleName)
@@ -73,7 +73,7 @@ class XmlDeserializePrimitivesSpec extends FunSuite{
 
   //TODO Unit...
 
-  def makeValidXml(key:String, value:String): String =
+  def makeValidXml(key: String, value: String): String =
     s"<my${key}Class><my$key>$value</my$key></my${key}Class>"
 
 }
