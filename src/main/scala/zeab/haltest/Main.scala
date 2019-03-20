@@ -16,7 +16,7 @@ object Main {
     val reflectedValue = reflectedType.decls
     val instance = mirror.reflect(reflectedClass).instance
     val methods = instance.getClass.getDeclaredMethods.toList
-    
+
     println()
 
   }
