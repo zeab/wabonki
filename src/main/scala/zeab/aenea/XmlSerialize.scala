@@ -38,21 +38,30 @@ object XmlSerialize {
     //TODO Change this is its a little more selective when applying the _ removal filter for user defined case classes
     val objParams: Iterable[Symbol] = objType.decls
       .filter(param => "value [^_]\\S".r.findFirstIn(param.toString) match {
-        case Some(_) => true;
+        case Some(_) => true
         case None => false
       })
       .filterNot(param => param.name.toString.lastOption.getOrElse("") == ' ')
     val possibleXml: Iterable[Either[Throwable, String]] =
       objParams
-        .map { param => coreSerialize(objInstance.reflectField(param.asTerm).get, param.name.toString) }
+        .map { param =>
+          //This checks for Unit types and gives back an exception if Unit is found
+          Try(objInstance.reflectField(param.asTerm).get) match {
+            case Success(fieldValue) => coreSerialize(fieldValue, param.name.toString)
+            case Failure(ex) => Left(ex)
+          }
+        }
     possibleXml.collectFirst { case Left(f) => f }.toLeft {
       possibleXml.collect { case Right(r) => r }.mkString
     }
   }
 
-
   private def coreSerialize(obj: Any, paramName: String)(implicit mirror: Mirror): Either[Throwable, String] = {
-    val objName: String = obj.getClass.getSimpleName
+    //This checks for Null type and handles it accordingly rather than erring out
+    val objName: String = Try(obj.getClass) match {
+      case Success(clazz) => clazz.getSimpleName
+      case Failure(_) => "Null"
+    }
     if (isPrimitive(objName)) Right(s"<$paramName>$obj</$paramName>")
     else if (objName == "$colon$colon") {
       val theList: List[Either[Throwable, String]] =
@@ -68,18 +77,17 @@ object XmlSerialize {
         case Some(actualValue) => coreSerialize(actualValue, paramName)
         case None => Right(s"<$paramName/>")
       }
-    //TODO Add more unsupported types here
-    else if (objName == "Either") {
-      Left(new Exception(s"Unsupported Type $objName"))
+    else if (objName == "Right" | objName == "Left") {
+      Left(new Exception(s"Unsupported Type for Serialization: Either"))
+    }
+    else if (objName == "Null") {
+      //Left(new Exception(s"Unsupported Type for Serialization: Null"))
+      Right(s"<$paramName/>")
     }
     else {
-      val nodeType: String = obj.getClass.getSimpleName
-      if (isPrimitive(nodeType)) coreSerialize(obj, paramName)
-      else {
-        serialize(obj) match {
-          case Right(xml) => Right(s"<$paramName>$xml</$paramName>")
-          case Left(ex) => Left(ex)
-        }
+      serialize(obj) match {
+        case Right(xml) => Right(s"<$paramName>$xml</$paramName>")
+        case Left(ex) => Left(ex)
       }
     }
   }

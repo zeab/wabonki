@@ -7,14 +7,14 @@ object Main {
   def main(args: Array[String]): Unit = {
 
     val xml = "<thingy><myThingy>4</myThingy></thingy>"
-    val myThingy = Thingy(4)
+    val myThingy = MyEitherBooleanClass1(Right(true))
 
     val out = XmlSerialize.xmlSerialize(myThingy)
 
-    val in = XmlDeserialize.xmlDeserialize[Thingy](xml)
-    println(in)
+    //val in = XmlDeserialize.xmlDeserialize[Thingy](xml)
+    //println(in)
 
-    println()
+    println(out)
 
   }
 
