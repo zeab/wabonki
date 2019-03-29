@@ -13,52 +13,11 @@ import scala.xml.XML.loadString
 //TODO Decide what to do about empty value inside a list... do I return a blank... or do I shorten the returned list by 1
 object XmlSerializer {
 
-//  //TODO Update this so it returns Either[Error, T] where T can be a String or Elem (Scala Xml)
-//  def xmlSerialize(input: Any): String = {
-//    implicit val mirror: Mirror = runtimeMirror(getClass.getClassLoader)
-//    val objName: String = input.getClass.getSimpleName.seq(0).toLower + input.getClass.getSimpleName.drop(1)
-//    s"<$objName>${serialize(input)}</$objName>"
-//  }
-
   def xmlDeserialize[T](input: String)(implicit typeTag: TypeTag[T]): T = {
     implicit val mirror: Mirror = runtimeMirror(getClass.getClassLoader)
     val xml: Elem = loadString(input)
     deserialize(List(typeTag.tpe.toString), xml).asInstanceOf[T]
   }
-
-//  private def serialize(input: Any)(implicit mirror: Mirror): String = {
-//    //This is the bit when i already have the obj as an any where I loop though and check the types
-//    val objType: Type = mirror.classSymbol(input.getClass).toType
-//    val objInstance: InstanceMirror = mirror.reflect(input)
-//    //TODO Change this is its a little more selective when applying the _ removal filter for user defined case classes
-//    val objParams: Iterable[Symbol] = objType.decls
-//      .filter(param => "value [^_]\\S".r.findFirstIn(param.toString) match {
-//        case Some(_) => true;
-//        case None => false
-//      })
-//      .filterNot(param => param.name.toString.lastOption.getOrElse("") == ' ')
-//    objParams
-//      .map { param => coreSerialize(objInstance.reflectField(param.asTerm).get, param.name.toString) }
-//      .mkString
-//  }
-//
-//  private def coreSerialize(obj: Any, paramName: String)(implicit mirror: Mirror): String = {
-//    val objName: String = obj.getClass.getSimpleName
-//    if (isPrimitive(objName)) s"<$paramName>$obj</$paramName>"
-//    else if (objName == "$colon$colon") obj.asInstanceOf[List[Any]].map { node =>
-//      coreSerialize(node, paramName)
-//    }.mkString
-//    else if (objName == "Some" | objName == "None$")
-//      obj.asInstanceOf[Option[Any]] match {
-//        case Some(actualValue) => coreSerialize(actualValue, paramName)
-//        case None => s"<$paramName/>"
-//      }
-//    else {
-//      val nodeType: String = obj.getClass.getSimpleName
-//      if (isPrimitive(nodeType)) coreSerialize(obj, paramName)
-//      else s"<$paramName>${serialize(obj)}</$paramName>"
-//    }
-//  }
 
   private def deserialize(typeNames: List[String], xml: Elem)(implicit mirror: Mirror): Any = {
     //TODO FIx this head so that if you get a "" back you error out
@@ -161,11 +120,5 @@ object XmlSerializer {
       .toList
     (paramName, paramTypes)
   }
-
-//  private def isPrimitive(nameToCheck: String): Boolean = {
-//    //TODO Now that im only using class names I can remove some of the dupe tags in here...one day...
-//    val primitives: List[String] = List("Double", "Float", "Long", "Int", "Integer", "Short", "Byte", "Char", "Character", "Unit", "Boolean", "String")
-//    primitives.contains(nameToCheck)
-//  }
 
 }
