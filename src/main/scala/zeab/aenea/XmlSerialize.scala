@@ -5,8 +5,6 @@ import scala.reflect.runtime.universe._
 import scala.util.{Failure, Success, Try}
 import scala.xml.XML.loadString
 
-//TODO Think about how to handle Unit (maybe just treat it as an None...?)
-//TODO Think about how to handle Either (if its a right maybe treat it as a value and left treat it as None? or maybe String?)
 //TODO Come back to this ... https://www.tutorialspoint.com/scala/scala_data_types.htm
 //TODO https://www.cs.helsinki.fi/u/wikla/OTS/Sisalto/examples/html/ch26.html
 //TODO Decide what to do about empty value inside a list... do I return a blank... or do I shorten the returned list by 1

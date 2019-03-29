@@ -3,12 +3,15 @@ package zeab.aenea.serialize
 //Imports
 import zeab.aenea.XmlSerialize._
 import zeab.aenea.modelsfortest.singleclasses.primitives._
+
+import scala.xml.Elem
+import scala.xml.XML.loadString
 //ScalaTest
 import org.scalatest.FunSuite
 
 class XmlSerializePrimitivesSpec extends FunSuite {
 
-  test("Double Serialize") {
+  test("Double [String] Serialize") {
     val obj: MyDoubleClass = MyDoubleClass(1.1)
     val serializedXml: Either[Throwable, String] = xmlSerialize(obj)
     val expectedXml: String = validXml("Double", 1.1.toString)
@@ -17,6 +20,17 @@ class XmlSerializePrimitivesSpec extends FunSuite {
       case Left(_) => false
     }}
   }
+
+  test("Double [Elem] Serialize") {
+    val obj: MyDoubleClass = MyDoubleClass(1.1)
+    val serializedXml: Either[Throwable, Elem] = xmlSerialize[Elem](obj)
+    val expectedXml: Elem = loadString(validXml("Double", 1.1.toString))
+    assert{serializedXml match {
+      case Right(xml) => xml == expectedXml
+      case Left(_) => false
+    }}
+  }
+
 
   test("Float Serialize") {
     val obj: MyFloatClass = MyFloatClass(6.1F)
