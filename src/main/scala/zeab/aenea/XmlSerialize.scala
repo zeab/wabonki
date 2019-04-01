@@ -24,17 +24,15 @@ object XmlSerialize extends AeneaToolbox {
               case Success(xml) => Right(xml.asInstanceOf[T])
               case Failure(_) => Left(new Exception("Invalid Xml unable to parse"))
             }
-          case _ => Left(new Exception(s"Unsupported type ${typeTag.tpe.typeSymbol.name.toString}"))
+          case _ => Left(new Exception(s"Unsupported return type: ${typeTag.tpe.typeSymbol.name.toString}"))
         }
       case Left(ex) => Left(ex)
     }
   }
 
   private def serialize(input: Any)(implicit mirror: Mirror): Either[Throwable, String] = {
-    //This is the bit when i already have the obj as an any where I loop though and check the types
     val inputType: Type = mirror.classSymbol(input.getClass).toType
     val inputInstance: InstanceMirror = mirror.reflect(input)
-    //TODO Change this is its a little more selective when applying the _ removal filter for user defined case classes
     val inputParams: Iterable[Symbol] = getObjParams(inputType)
     val possibleXml: List[Either[Throwable, String]] =
       inputParams

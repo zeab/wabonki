@@ -15,10 +15,12 @@ class XmlSerializeComplexClassesSpec extends FunSuite {
     val obj: Person = person
     val serializedXml: Either[Throwable, String] = xmlSerialize(obj)
     val expectedXml: String = "<person><name>bob</name><class>warlock</class><level>9</level><health>87.3</health><soulStone/><mount><name>daisy</name><speed>1.4</speed><backpack></backpack></mount><backpack><name>sword</name><type>attack</type></backpack><backpack><name>shield</name><type>defense</type></backpack><previousDestinations>Hogwarts</previousDestinations><previousDestinations>Yavin 4</previousDestinations></person>"
-    assert{serializedXml match {
-      case Right(xml) => xml == expectedXml
-      case Left(_) => false
-    }}
+    assert {
+      serializedXml match {
+        case Right(xml) => xml == expectedXml
+        case Left(_) => false
+      }
+    }
   }
 
 }

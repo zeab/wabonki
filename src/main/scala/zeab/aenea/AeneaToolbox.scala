@@ -6,14 +6,14 @@ import scala.reflect.runtime.universe._
 //Collection of functions used by both
 trait AeneaToolbox {
 
-  def getObjParams(inputType:Type): Iterable[Symbol] ={
+  def getObjParams(inputType: Type): Iterable[Symbol] = {
     inputType.decls
-      .filter{param =>
+      .filter { param =>
         //TODO Check if this actually works correctly...
         //It only matters since primitives have values that start with _ that we do not need to reflect on
         //Checks if the value is a primitive or not to see if we need to filter out values starting with _
         val valueCheck: Boolean =
-          if(isPrimitive(inputType.typeSymbol.name.toString)) {
+          if (isPrimitive(inputType.typeSymbol.name.toString)) {
             "value [^_].*".r.findFirstIn(param.toString) match {
               case Some(_) => true
               case None => false
@@ -35,14 +35,14 @@ trait AeneaToolbox {
   }
 
   //Flattens the list so that only the first left if found is kept but all the rights are unwrapped and stacked
-  def flattenEitherValues(eitherValues:List[Either[Throwable, Any]]): Either[Throwable, List[Any]] ={
+  def flattenEitherValues(eitherValues: List[Either[Throwable, Any]]): Either[Throwable, List[Any]] = {
     eitherValues.collectFirst { case Left(f) => f }.toLeft {
       eitherValues.collect { case Right(r) => r }
     }
   }
 
   //Flattens the list and makes all the right value one long string
-  def flattenEitherValuesAndRightString(eitherValues:List[Either[Throwable, String]]): Either[Throwable, String] ={
+  def flattenEitherValuesAndRightString(eitherValues: List[Either[Throwable, String]]): Either[Throwable, String] = {
     eitherValues.collectFirst { case Left(f) => f }.toLeft {
       eitherValues.collect { case Right(r) => r }.mkString
     }

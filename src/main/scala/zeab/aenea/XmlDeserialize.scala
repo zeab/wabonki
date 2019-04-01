@@ -3,8 +3,8 @@ package zeab.aenea
 //Imports
 import scala.reflect.runtime.universe._
 import scala.util.{Failure, Success, Try}
-import scala.xml.{Elem, NodeSeq}
 import scala.xml.XML.loadString
+import scala.xml.{Elem, NodeSeq}
 
 object XmlDeserialize extends AeneaToolbox {
 

@@ -76,15 +76,15 @@ class XmlDeserializePrimitivesSpec extends FunSuite {
     }
   }
 
-//  test("Char Deserialize") {
-//    val expectedType: String = "MyCharClass"
-//    val xml: String = makeValidXml("Char", 'c'.toString)
-//    xmlDeserialize[MyCharClass](xml) match {
-//      case Right(obj) =>
-//        assert(expectedType == obj.getClass.getSimpleName)
-//      case Left(_) => assert(false)
-//    }
-//  }
+  //  test("Char Deserialize") {
+  //    val expectedType: String = "MyCharClass"
+  //    val xml: String = makeValidXml("Char", 'c'.toString)
+  //    xmlDeserialize[MyCharClass](xml) match {
+  //      case Right(obj) =>
+  //        assert(expectedType == obj.getClass.getSimpleName)
+  //      case Left(_) => assert(false)
+  //    }
+  //  }
 
   test("Boolean Deserialize") {
     val expectedType: String = "MyBooleanClass"

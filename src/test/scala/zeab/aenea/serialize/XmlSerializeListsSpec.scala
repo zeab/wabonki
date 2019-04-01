@@ -13,10 +13,12 @@ class XmlSerializeListsSpec extends FunSuite {
     val obj: MyListDoubleClass = MyListDoubleClass(theList)
     val serializedXml: Either[Throwable, String] = xmlSerialize(obj)
     val expectedXml: String = validXml("ListDouble", theList)
-    assert{serializedXml match {
-      case Right(xml) => xml == expectedXml
-      case Left(_) => false
-    }}
+    assert {
+      serializedXml match {
+        case Right(xml) => xml == expectedXml
+        case Left(_) => false
+      }
+    }
   }
 
   test("List: Int Serialize") {
@@ -24,10 +26,12 @@ class XmlSerializeListsSpec extends FunSuite {
     val obj: MyListIntClass = MyListIntClass(theList)
     val serializedXml: Either[Throwable, String] = xmlSerialize(obj)
     val expectedXml: String = validXml("ListInt", theList)
-    assert{serializedXml match {
-      case Right(xml) => xml == expectedXml
-      case Left(_) => false
-    }}
+    assert {
+      serializedXml match {
+        case Right(xml) => xml == expectedXml
+        case Left(_) => false
+      }
+    }
   }
 
   test("List: String Serialize") {
@@ -35,10 +39,12 @@ class XmlSerializeListsSpec extends FunSuite {
     val obj: MyListStringClass = MyListStringClass(theList)
     val serializedXml: Either[Throwable, String] = xmlSerialize(obj)
     val expectedXml: String = validXml("ListString", theList)
-    assert{serializedXml match {
-      case Right(xml) => xml == expectedXml
-      case Left(_) => false
-    }}
+    assert {
+      serializedXml match {
+        case Right(xml) => xml == expectedXml
+        case Left(_) => false
+      }
+    }
   }
 
   test("List: Long Serialize") {
@@ -46,10 +52,12 @@ class XmlSerializeListsSpec extends FunSuite {
     val obj: MyListLongClass = MyListLongClass(theList)
     val serializedXml: Either[Throwable, String] = xmlSerialize(obj)
     val expectedXml: String = validXml("ListLong", theList)
-    assert{serializedXml match {
-      case Right(xml) => xml == expectedXml
-      case Left(_) => false
-    }}
+    assert {
+      serializedXml match {
+        case Right(xml) => xml == expectedXml
+        case Left(_) => false
+      }
+    }
   }
 
   test("List: Boolean Serialize") {
@@ -57,10 +65,12 @@ class XmlSerializeListsSpec extends FunSuite {
     val obj: MyListBooleanClass = MyListBooleanClass(theList)
     val serializedXml: Either[Throwable, String] = xmlSerialize(obj)
     val expectedXml: String = validXml("ListBoolean", theList)
-    assert{serializedXml match {
-      case Right(xml) => xml == expectedXml
-      case Left(_) => false
-    }}
+    assert {
+      serializedXml match {
+        case Right(xml) => xml == expectedXml
+        case Left(_) => false
+      }
+    }
   }
 
   test("List: Short Serialize") {
@@ -68,13 +78,15 @@ class XmlSerializeListsSpec extends FunSuite {
     val obj: MyListShortClass = MyListShortClass(theList)
     val serializedXml: Either[Throwable, String] = xmlSerialize(obj)
     val expectedXml: String = validXml("ListShort", theList)
-    assert{serializedXml match {
-      case Right(xml) => xml == expectedXml
-      case Left(_) => false
-    }}
+    assert {
+      serializedXml match {
+        case Right(xml) => xml == expectedXml
+        case Left(_) => false
+      }
+    }
   }
 
-  def validXml(key: String, values:List[Any]): String =
-    s"<my${key}Class>${values.map{value =>s"<my$key>$value</my$key>"}.mkString}</my${key}Class>"
+  def validXml(key: String, values: List[Any]): String =
+    s"<my${key}Class>${values.map { value => s"<my$key>$value</my$key>" }.mkString}</my${key}Class>"
 
 }
