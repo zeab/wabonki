@@ -29,8 +29,7 @@ trait AeneaToolbox {
           case Some(_) => true
           case None => false
         }
-        if (valueCheck & endOfLineSpaceCheck) true
-        else false
+        valueCheck & endOfLineSpaceCheck
       }
   }
 

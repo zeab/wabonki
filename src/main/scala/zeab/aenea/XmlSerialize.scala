@@ -52,25 +52,27 @@ object XmlSerialize extends AeneaToolbox {
       case Success(clazz) => clazz.getSimpleName
       case Failure(_) => "Null"
     }
-    if (isPrimitive(objName)) Right(s"<$paramName>$obj</$paramName>")
-    else if (objName == "$colon$colon") {
-      val theList: List[Either[Throwable, String]] =
-        obj.asInstanceOf[List[Any]]
-          .map { node => coreSerialize(node, paramName) }
-      flattenEitherValuesAndRightString(theList)
+    objName match {
+      case "Some" | "None$" =>
+        obj.asInstanceOf[Option[Any]] match {
+          case Some(actualValue) => coreSerialize(actualValue, paramName)
+          case None => Right(s"<$paramName/>")
+        }
+      case "$colon$colon" =>
+        val theList: List[Either[Throwable, String]] =
+          obj.asInstanceOf[List[Any]]
+            .map { node => coreSerialize(node, paramName) }
+        flattenEitherValuesAndRightString(theList)
+      case "Right" | "Left" => Left(new Exception(s"Unsupported Type for Serialization: Either"))
+      case "Null" => Right(s"<$paramName/>")
+      case _ =>
+        if (isPrimitive(objName)) Right(s"<$paramName>$obj</$paramName>")
+        else
+          serialize(obj) match {
+            case Right(xml) => Right(s"<$paramName>$xml</$paramName>")
+            case Left(ex) => Left(ex)
+          }
     }
-    else if (objName == "Some" | objName == "None$")
-      obj.asInstanceOf[Option[Any]] match {
-        case Some(actualValue) => coreSerialize(actualValue, paramName)
-        case None => Right(s"<$paramName/>")
-      }
-    else if (objName == "Right" | objName == "Left") Left(new Exception(s"Unsupported Type for Serialization: Either"))
-    else if (objName == "Null") Right(s"<$paramName/>")
-    else
-      serialize(obj) match {
-        case Right(xml) => Right(s"<$paramName>$xml</$paramName>")
-        case Left(ex) => Left(ex)
-      }
   }
 
 }
