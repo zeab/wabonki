@@ -33,19 +33,9 @@ class XmlDeserializeComplexClassesSpec extends FunSuite {
   test("Invalid Person Deserialize") {
     val xml: String = "<person><name>bob</name><class>warlock</class><level>9</level><health>87.3</health><soulStone/><mount><name>daisy</name><speed>1.4</speed><backpack></backpack></mount><backpack><name>sword</name></backpack><backpack><name>shield</name><type>defense</type></backpack><previousDestinations>Hogwarts</previousDestinations><previousDestinations>Yavin 4</previousDestinations></person>"
     xmlDeserialize[Person](xml) match {
-      case Right(x) =>
-        val u = x
-        assert(false)
-      case Left(ex) =>
-        val ii = ex
-        assert(true)
+      case Right(_) => assert(false)
+      case Left(_) => assert(true)
     }
   }
 
 }
-
-//test cases to do
-
-//an option that is invalid to decode
-//a list that is invalid to decode
-//a user class that is invalid to decode

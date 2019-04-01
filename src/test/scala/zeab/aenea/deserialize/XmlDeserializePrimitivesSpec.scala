@@ -9,7 +9,6 @@ import org.scalatest.FunSuite
 class XmlDeserializePrimitivesSpec extends FunSuite {
 
   test("Invalid Double Deserialize") {
-    val expectedType: String = "MyDoubleClass"
     val xml: String = makeValidXml("Double", "llama")
     xmlDeserialize[MyDoubleClass](xml) match {
       case Right(_) => assert(false)
