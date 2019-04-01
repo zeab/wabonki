@@ -6,6 +6,12 @@ import zeab.seed.terminal.{TerminalError, TerminalResponse}
 import scala.sys.process._
 import scala.util.{Failure, Success, Try}
 
+/**
+  * Easy way to deal with the terminal
+  *
+  * @author Kevin Kosnik-Downs (Zeab)
+  * @since 2.12
+  */
 package object terminalclient {
 
   /** Execute a cmd command and return the result once its been completed */

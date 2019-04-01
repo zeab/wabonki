@@ -11,7 +11,12 @@ import akka.stream.ActorMaterializer
 //Scala
 import scala.concurrent.ExecutionContext
 
-/** A ready to go web server bundled inside a web server */
+/**
+  * A ready to go web server bundled inside a web server
+  *
+  * @author Kevin Kosnik-Downs (Zeab)
+  * @since 2.12
+  */
 class WebServiceActor(implicit val actorMaterializer: ActorMaterializer) extends Actor {
 
   val log: LoggingAdapter = Logging(context.system, this)

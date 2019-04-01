@@ -1,17 +1,16 @@
 package zeab.akkatools.udp.client
 
 //Imports
-import zeab.envgrok.EnvGrok
+import zeab.sys.EnvironmentVariables
 //Akka
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.routing.RoundRobinPool
 
+trait UdpClientEnvGrok extends EnvironmentVariables {
 
-trait UdpClientEnvGrok extends EnvGrok {
-
-  val udpClientHost: String = envGrok("UDP_CLIENT_HOST", "localhost")
-  val udpClientPort: String = envGrok("UDP_CLIENT_PORT", "8125")
-  val isUdpClientConnected: Boolean = envGrok("IS_UDP_CLIENT_CONNECTED", "true").toBoolean
+  val udpClientHost: String = getEnvVar("UDP_CLIENT_HOST", "localhost")
+  val udpClientPort: String = getEnvVar("UDP_CLIENT_PORT", "8125")
+  val isUdpClientConnected: Boolean = getEnvVar("IS_UDP_CLIENT_CONNECTED", "true").toBoolean
 
   //Udp Client
   def createUdpClient(poolSize: Int = 5, isConnected: Boolean = isUdpClientConnected)(implicit actorSystem: ActorSystem): ActorRef =

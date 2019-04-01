@@ -3,7 +3,12 @@ package zeab.aenea
 //Imports
 import scala.reflect.runtime.universe._
 
-//Collection of functions used by both
+/**
+  * A collection of useful functions for supporting Aenea's other jobs
+  *
+  * @author Kevin Kosnik-Downs (Zeab)
+  * @since 2.12
+  */
 trait AeneaToolbox {
 
   def getObjParams(inputType: Type): Iterable[Symbol] = {

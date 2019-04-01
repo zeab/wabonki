@@ -1,12 +1,12 @@
 package zeab.logging
 
 //Imports
-import zeab.envgrok.EnvGrok
+import zeab.sys.EnvironmentVariables
 //Other
 import ch.qos.logback.classic.{Level, LoggerContext}
 import org.slf4j.{Logger, LoggerFactory}
 
-trait Logging extends EnvGrok{
+trait Logging extends EnvironmentVariables{
 
   //Grab the logging context
   val loggerContext: LoggerContext = LoggerFactory.getILoggerFactory.asInstanceOf[LoggerContext]
@@ -27,8 +27,8 @@ trait Logging extends EnvGrok{
   //Log to consume without json wrapping
   val logRaw: Logger = LoggerFactory.getLogger("stdout")
 
-  def getLogLevel(key:String, default:String): Level ={
-    envGrok(key, default).toUpperCase match {
+  def getLogLevel(key:String, default:String): Level =
+    getEnvVar(key, default).toUpperCase match {
       case "ERROR" => Level.ERROR
       case "WARN" | "WARNING" => Level.WARN
       case "INFO" => Level.INFO
@@ -36,6 +36,5 @@ trait Logging extends EnvGrok{
       case "OFF" => Level.OFF
       case "TRACE" => Level.TRACE
     }
-  }
 
 }

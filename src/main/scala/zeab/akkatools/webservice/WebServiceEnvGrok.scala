@@ -1,11 +1,11 @@
 package zeab.akkatools.webservice
 
 //Imports
-import zeab.envgrok.EnvGrok
+import zeab.sys.EnvironmentVariables
 
-trait WebServiceEnvGrok extends EnvGrok {
+trait WebServiceEnvGrok extends EnvironmentVariables {
 
-  val webServiceHostKey: String = envGrok("WEB_SERVICE_HOST", "0.0.0.0")
-  val webServicePortKey: String = envGrok("WEB_SERVICE_PORT", "8080")
+  val webServiceHostKey: String = getEnvVar("WEB_SERVICE_HOST", "0.0.0.0")
+  val webServicePortKey: String = getEnvVar("WEB_SERVICE_PORT", "8080")
 
 }

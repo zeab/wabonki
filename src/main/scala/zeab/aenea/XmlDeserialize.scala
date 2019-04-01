@@ -6,6 +6,12 @@ import scala.util.{Failure, Success, Try}
 import scala.xml.XML.loadString
 import scala.xml.{Elem, NodeSeq}
 
+/**
+  * An automatic case class Xml Deserializer
+  *
+  * @author Kevin Kosnik-Downs (Zeab)
+  * @since 2.12
+  */
 object XmlDeserialize extends AeneaToolbox {
 
   //Entry way into deserialize... this is where all the magic starts
@@ -67,41 +73,13 @@ object XmlDeserialize extends AeneaToolbox {
         //            }
         //          case Failure(_) => ' '
         //        }
-        case "Byte" =>
-          Try(possibleNodeValue.toByte) match {
-            case Success(value) => Right(value)
-            case Failure(_) => Left(new Exception(s"Unable to cast Value: $possibleNodeValue to Byte"))
-          }
-        case "Float" =>
-          Try(possibleNodeValue.toFloat) match {
-            case Success(value) => Right(value)
-            case Failure(_) => Left(new Exception(s"Unable to cast Value: $possibleNodeValue to Float"))
-          }
-        case "Long" =>
-          Try(possibleNodeValue.toLong) match {
-            case Success(value) => Right(value)
-            case Failure(_) => Left(new Exception(s"Unable to cast Value: $possibleNodeValue to Long"))
-          }
-        case "Short" =>
-          Try(possibleNodeValue.toShort) match {
-            case Success(value) => Right(value)
-            case Failure(_) => Left(new Exception(s"Unable to cast Value: $possibleNodeValue to Short"))
-          }
-        case "Double" =>
-          Try(possibleNodeValue.toDouble) match {
-            case Success(value) => Right(value)
-            case Failure(_) => Left(new Exception(s"Unable to cast Value: $possibleNodeValue to Double"))
-          }
-        case "Int" =>
-          Try(possibleNodeValue.toInt) match {
-            case Success(value) => Right(value)
-            case Failure(_) => Left(new Exception(s"Unable to cast Value: $possibleNodeValue to Int"))
-          }
-        case "Boolean" =>
-          Try(possibleNodeValue.toBoolean) match {
-            case Success(value) => Right(value)
-            case Failure(_) => Left(new Exception(s"Unable to cast Value: $possibleNodeValue to Boolean"))
-          }
+        case "Byte" => returnMatch(Try(possibleNodeValue.toByte))
+        case "Float" => returnMatch(Try(possibleNodeValue.toFloat))
+        case "Long" => returnMatch(Try(possibleNodeValue.toLong))
+        case "Short" => returnMatch(Try(possibleNodeValue.toShort))
+        case "Double" => returnMatch(Try(possibleNodeValue.toDouble))
+        case "Int" => returnMatch(Try(possibleNodeValue.toInt))
+        case "Boolean" => returnMatch(Try(possibleNodeValue.toBoolean))
         case "List" =>
           if (possibleNodeSeq.toString == s"<$paramName/>") Right(List.empty)
           else {
@@ -141,4 +119,9 @@ object XmlDeserialize extends AeneaToolbox {
     (paramName, paramTypes)
   }
 
+  private def returnMatch(theTry:Try[Any]): Either[Throwable, Any] =
+    theTry match {
+      case Success(value) => Right(value)
+      case Failure(ex) => Left(ex)
+    }
 }

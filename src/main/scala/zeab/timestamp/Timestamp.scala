@@ -4,6 +4,7 @@ package zeab.timestamp
 import java.time.format.DateTimeFormatter
 import java.time.{LocalDateTime, ZoneId, ZoneOffset, ZonedDateTime}
 
+//TODO Figure out if this is any good...
 trait Timestamp{
 
   val timestampFormatKey: String = "yyyy-MM-dd-HH.mm.ss.SSS"
