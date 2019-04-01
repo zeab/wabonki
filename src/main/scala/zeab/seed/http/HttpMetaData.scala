@@ -16,7 +16,6 @@ trait HttpMetaData{
 
   def setBearer(value:String): Map[String, String] = Map(setBearerKey -> value)
 
-
 }
 
 object HttpMetaData extends HttpMetaData

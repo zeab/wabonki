@@ -1,5 +1,8 @@
 package zeab.seed
 
+//Need to do something like ... move all the formatting into here and call it that...
+//Then move it into the core bit so that its not just hanging out here by it self...
+
 trait MapExtended {
 
   def mapFormat(m: Map[String, String]): String =

@@ -32,8 +32,8 @@ package object terminalclient {
         }
     }
     //TODO Try and make this tread safe somehow since StringBuilder is not
-    val stdout = new StringBuilder
-    val stderr = new StringBuilder
+    val stdout: StringBuilder = new StringBuilder
+    val stderr: StringBuilder = new StringBuilder
     val execCmd = Try(cmdBundle ! ProcessLogger(stdout append _ + "\n", stderr append _ + "\n"), stdout, stderr)
     execCmd match {
       case Success(process) =>

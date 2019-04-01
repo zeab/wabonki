@@ -102,7 +102,7 @@ package object j2sjavanethttpclient {
                       val t0: Long = System.currentTimeMillis()
                       Try(openConn.getResponseCode) match {
                         case Success(respCode) =>
-                          val t1 = System.currentTimeMillis()
+                          val t1: Long = System.currentTimeMillis()
                           //TODO Make this configurable from metadata...? i think...?
                           val responseBody: String =
                             if (isReturnBody) {
