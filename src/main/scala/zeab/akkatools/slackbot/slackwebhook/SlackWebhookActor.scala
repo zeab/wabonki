@@ -9,7 +9,7 @@ import zeab.akkatools.slackbot.slackseeds.slack.models.request.{PostSlackClump, 
 import zeab.akkatools.slackbot.slackseeds.slack.seeds.Slack
 import zeab.akkatools.slackbot.slackwebhook.SlackWebhookMessages.PostSlackWebhook
 import zeab.j2sjavanethttpclient.HttpClient
-import zeab.seed.http.httpclient.{HttpClientError, HttpClientResponse}
+import zeab.seed.http.httpclientmessages.{HttpClientError, HttpClientResponse}
 //Akka
 import akka.actor.{Actor, ActorLogging, ActorSystem, Cancellable}
 import akka.stream.ActorMaterializer

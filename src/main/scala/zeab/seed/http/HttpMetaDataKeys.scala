@@ -1,6 +1,6 @@
 package zeab.seed.http
 
-trait HttpMetaData{
+trait HttpMetaDataKeys{
 
   val setDomainKey: String = "SetDomain"
   
@@ -14,8 +14,8 @@ trait HttpMetaData{
 
   val setBearerKey: String = "SetBearer"
 
-  def setBearer(value:String): Map[String, String] = Map(setBearerKey -> value)
+  def setBearerHeader(value:String): Map[String, String] = Map(setBearerKey -> value)
 
 }
 
-object HttpMetaData extends HttpMetaData
+object HttpMetaDataKeys extends HttpMetaDataKeys

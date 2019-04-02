@@ -33,7 +33,7 @@ object Dependencies {
     val logback                     = "ch.qos.logback" % "logback-classic" % V.logback
     val logbackJson                 = "net.logstash.logback" % "logstash-logback-encoder" % V.logbackJson
     //Test
-    val scalaTest                   = "org.scalatest" %% "scalatest" % V.scalaTest % "test"
+    val scalaTest                   = "org.scalatest" %% "scalatest" % V.scalaTest
     val akkaTestKit                 = "com.typesafe.akka" %% "akka-testkit" % V.akka % Test
     //Scala XML
     val scalaXML                    = "org.scala-lang.modules" %% "scala-xml" % V.scalaXML
