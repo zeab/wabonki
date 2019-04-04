@@ -2,14 +2,16 @@ package zeab.haltestkit
 
 //Imports
 import java.util.UUID
+
 import akka.actor.Actor
+
 import scala.util.{Failure, Success, Try}
 
-class HalMinionActor extends Actor{
+class HalMinionActor extends Actor {
 
   def receive: Receive = {
     case registeredTest: RegisteredTest =>
-      val testStartTime:Long = System.currentTimeMillis
+      val testStartTime: Long = System.currentTimeMillis
       val testResult: TestResult = Try(registeredTest.test.apply()) match {
         case Success(_) => TestResult(true, "assertion passed")
         case Failure(exception) => TestResult(false, exception.getMessage)

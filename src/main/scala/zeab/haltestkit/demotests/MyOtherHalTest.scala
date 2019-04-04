@@ -7,6 +7,7 @@ class MyOtherHalTest extends HalTest {
   test("3 + 1 == 4"){
     val expectedValue: Int = 4
     val actualValue: Int = 3 + 1
+    Thread.sleep(2000)
     assert(expectedValue == actualValue, s"$expectedValue != $actualValue")
   }
 
