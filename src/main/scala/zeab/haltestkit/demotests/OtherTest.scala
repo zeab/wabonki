@@ -8,6 +8,7 @@ class OtherTest extends HalTest2{
   test("1 + 1 == 2") {
     val expectedValue: Int = 2
     val actualValue: Int = 1 + 1
+    //assert(false, "because i blew up")
     ("llama", expectedValue == actualValue, "end")
   }
 
