@@ -12,7 +12,7 @@ object Main {
 
   def main(args: Array[String]): Unit = {
 
-    val test = "zeab.haltestkit.demotests.OtherTest"
+    val test = "experimental.haltestkit.demotests.OtherTest"
 
     val runTimeMirror: Mirror = runtimeMirror(getClass.getClassLoader)
     val reflectedClassSymbol: ClassSymbol = runTimeMirror.staticClass(test)

@@ -1,18 +1,17 @@
-package zeab.haltestkit
+package experimental.haltestkit
 
-//Imports
 import akka.actor.{ActorRef, ActorSystem, Props}
 import zeab.akkatools.akkaconfigbuilder.AkkaConfigBuilder
 import zeab.haltestkit.halrunner.{HalRunner, HalRunnerLogger}
 import zeab.sys.EnvironmentVariables
-//Scala
+
 import scala.concurrent.ExecutionContext
 
 object Main extends EnvironmentVariables {
 
   def main(args: Array[String]): Unit = {
 
-    val dirForDiscovery: String = getEnvVar[String]("tests", "zeab.haltestkit.demotests")
+    val dirForDiscovery: String = getEnvVar[String]("tests", "experimental.haltestkit.demotests")
     val tagsToRun: List[String] = getEnvVar("tags", ',', List.empty)
 
     //Akka

@@ -1,4 +1,4 @@
-package zeab.haltestkit.demotests
+package experimental.haltestkit.demotests
 
 //Imports
 import akka.actor.ActorRef
