@@ -65,11 +65,12 @@ class HalRunner(dirForDiscovery: String, testTagsToRun: List[String], logger: Ac
         val filteredTests: List[RegisteredTest] =
           if (testTagsToRun.isEmpty) updatedRegisteredTests
           else
-            updatedRegisteredTests.filter { test =>
-              test.testTags.exists { tag =>
-                test.testTags
-                  .map (_.name)
-                  .contains(tag.name)
+            updatedRegisteredTests.filter{test =>
+              test.testTags.map(_.name).find{ tag =>
+                testTagsToRun.contains(tag)
+              } match {
+                case Some(_) => true
+                case None => false
               }
             }
         context.become(testRun(filteredTests))
