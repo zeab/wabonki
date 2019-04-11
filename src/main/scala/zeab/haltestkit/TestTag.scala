@@ -1,3 +1,3 @@
 package zeab.haltestkit
 
-case class TestTag(name:String)
+case class TestTag(name: String)
