@@ -14,7 +14,6 @@ trait AeneaToolbox {
   def getObjParams(inputType: Type): Iterable[Symbol] = {
     inputType.decls
       .filter { param =>
-        //TODO Check if this actually works correctly...
         //It only matters since primitives have values that start with _ that we do not need to reflect on
         //Checks if the value is a primitive or not to see if we need to filter out values starting with _
         val valueCheck: Boolean =

@@ -15,7 +15,7 @@ object Dependencies {
     val scalaTest                   = "3.0.5"
     val scalaXML                    = "1.0.6"
   }
-
+  
   //List of Dependencies
   val D = new {
     //Akka
@@ -37,6 +37,7 @@ object Dependencies {
     val akkaTestKit                 = "com.typesafe.akka" %% "akka-testkit" % V.akka % Test
     //Scala XML
     val scalaXML                    = "org.scala-lang.modules" %% "scala-xml" % V.scalaXML
+    val classUtil                   = "org.clapper" %% "classutil" % "1.4.0"
   }
 
   val wabonkiDependencies: Seq[ModuleID] = Seq(
@@ -51,7 +52,8 @@ object Dependencies {
     D.logbackJson,
     D.scalaTest,
     D.akkaTestKit,
-    D.scalaXML
+    D.scalaXML,
+    D.classUtil
   )
 
 }
