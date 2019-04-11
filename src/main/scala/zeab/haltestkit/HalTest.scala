@@ -1,15 +1,17 @@
 package zeab.haltestkit
 
-class HalTest {
+//Imports
+import akka.actor.ActorRef
+import zeab.haltestkit.teststatuses.RegisteredTest
 
-  //This is the eye sore of the entire project but I just cant figure out the way around it...
-  var testList: List[RegisteredTest] = List.empty[RegisteredTest]
+class HalTest(testRegister:ActorRef) {
 
-  //Upon instantiation capture the test function and test name and register then in a list
-  def test(testName: String)(test: => Any): Unit =
-    testList = testList ++ List(RegisteredTest(testName, test _))
+  //Counts the total number of tests that attempt to register themselves so we know how many to expect
+  var testCount: Int = 0
 
-  //How the frazzle muffle does it know where to go...
-  //How can i register this test on its invocation into this world as a baby function...???
+  def test(testName: String, testTags: TestTag*)(test: => Any): Unit = {
+    testCount = testCount + 1
+    testRegister ! RegisteredTest(testName, testTags.toList, test _)
+  }
 
 }

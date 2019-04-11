@@ -21,6 +21,13 @@ import scala.annotation.tailrec
   */
 trait ThreadLocalRandom {
 
+  /** Sets the random seed for every ThreadLocalRandom call
+    *
+    * @param seed          The value to use to seed the ThreadLocalRandom calls
+    * @return Unit
+    */
+  def setRandomSeed(seed: Long): Unit = JavaThreadLocalRandom.current().setSeed(seed)
+
   /** Returns the next generated pseudorandom Double between user defined max and user defined min from the current thread local random instance with specific amount of decimal places.
     *
     * @param max           The greatest Double the return can possibly be (inclusive)
