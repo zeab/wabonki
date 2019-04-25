@@ -12,6 +12,26 @@ import scala.util.{Failure, Success, Try}
   */
 trait EnvironmentVariables extends SysToolbox {
 
+  /** Looks for the value of the environment variable specified and throws the error or a custom one if not found
+    *
+    * @param keyToLookFor The environment variables key to look for
+    * @param customError  The custom throwable to throw if the keyToLookFor is not found
+    * @return T
+    */
+  def getEnvVar[T](keyToLookFor: String, customError: Option[Throwable] = None)(implicit typeTag: TypeTag[T]): T = {
+    Try(sys.env(keyToLookFor)) match {
+      case Success(envVal) => formatValue[T](typeTag.tpe.typeSymbol.name.toString, envVal) match {
+        case Right(value) => value
+        case Left(ex) => throw ex
+      }
+      case Failure(ex) =>
+        customError match {
+          case Some(customEx) => throw customEx
+          case None => throw ex
+        }
+    }
+  }
+
   /** Looks for the value of the environment variable specified
     *
     * @param keyToLookFor The environment variables key to look for

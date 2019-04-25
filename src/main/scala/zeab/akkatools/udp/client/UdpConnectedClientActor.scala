@@ -18,11 +18,11 @@ class UdpConnectedClientActor(host: String, port: String) extends Actor {
 
   val remote: InetSocketAddress = new InetSocketAddress(host, port.toInt)
 
-  implicit val actorSystem:ActorSystem = context.system
+  implicit val actorSystem: ActorSystem = context.system
 
   def receive: Receive = {
     case UdpConnected.Connected =>
-      actorLog.debug(s"connecting udp")
+      actorLog.debug(s"Connecting udp $host:$port")
       context.become(ready(sender()))
   }
 
@@ -34,10 +34,10 @@ class UdpConnectedClientActor(host: String, port: String) extends Actor {
       actorLog.debug(s"Sending Udp $host:$port msg: ${msg.msg}")
       connection ! UdpConnected.Send(ByteString(msg.msg))
     case UdpConnected.Disconnect =>
-      actorLog.debug(s"disconnecting udp")
+      actorLog.debug(s"disconnecting udp $host:$port")
       connection ! UdpConnected.Disconnect
     case UdpConnected.Disconnected =>
-      actorLog.debug(s"disconnected udp")
+      actorLog.debug(s"disconnected udp $host:$port")
       context.stop(self)
   }
 

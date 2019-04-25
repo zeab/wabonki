@@ -1,4 +1,4 @@
-package zeab.akkatools.slackbot.slackseeds.slackrtm.models.general
+package zeab.akkatools.slack.slackseeds.slackrtm.models.general
 
 case class Team(
                  id: String,

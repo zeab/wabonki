@@ -5,15 +5,16 @@ object Dependencies {
 
   //List of Versions
   val V = new {
-    val akka                        = "2.5.19"
-    val akkaHttp                    = "10.1.7"
-    val akkaHttpCirce               = "1.21.0"
-    val akkaKafka                   = "0.22"
-    val circe                       = "0.9.3"
+    val akka                        = "2.5.22"
+    val akkaHttp                    = "10.1.8"
+    val akkaHttpCirce               = "1.25.2"
+    val akkaKafka                   = "1.0.1"
+    val circe                       = "0.11.1"
     val logbackJson                 = "5.2"
     val logback                     = "1.2.3"
     val scalaTest                   = "3.0.5"
     val scalaXML                    = "1.0.6"
+    val classUtil                   = "1.4.0"
   }
   
   //List of Dependencies
@@ -37,19 +38,19 @@ object Dependencies {
     val akkaTestKit                 = "com.typesafe.akka" %% "akka-testkit" % V.akka % Test
     //Scala XML
     val scalaXML                    = "org.scala-lang.modules" %% "scala-xml" % V.scalaXML
-    val classUtil                   = "org.clapper" %% "classutil" % "1.4.0"
+    val classUtil                   = "org.clapper" %% "classutil" % V.classUtil
   }
 
   val wabonkiDependencies: Seq[ModuleID] = Seq(
+    D.logback,
+    D.logbackJson,
+    D.akkaSlf4j,
     D.akkaStream,
     D.akkaHttp,
     D.akkaHttpCirce,
-    D.akkaKafka,
     D.circeCore,
     D.circeParser,
-    D.akkaSlf4j,
-    D.logback,
-    D.logbackJson,
+    D.akkaKafka,
     D.scalaTest,
     D.akkaTestKit,
     D.scalaXML,
