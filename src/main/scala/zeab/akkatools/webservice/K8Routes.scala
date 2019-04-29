@@ -8,9 +8,8 @@ import akka.http.scaladsl.server.Route
 
 object K8Routes {
 
-  //TODO Allow for a function to be called to expand the health check for other services...
-  def readinessCheck(implicit actorSystem: ActorSystem): Route = {
-    pathPrefix("readiness") {
+  def readinessCheck(path: String = "readiness")(implicit actorSystem: ActorSystem): Route = {
+    pathPrefix(path) {
       get {
         complete(StatusCodes.OK, "Readiness Check Passed")
       }
@@ -18,10 +17,10 @@ object K8Routes {
   }
 
   //TODO Allow for a function to be called to expand the health check for other services...
-  def healthCheck(implicit actorSystem: ActorSystem): Route = {
-    pathPrefix("health") {
+  def livenessCheck(path: String = "liveness")(implicit actorSystem: ActorSystem): Route = {
+    pathPrefix(path) {
       get {
-        complete(StatusCodes.OK, "Health Check Passed")
+        complete(StatusCodes.OK, "Liveness Check Passed")
       }
     }
   }
