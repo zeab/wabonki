@@ -47,6 +47,11 @@ class SlackBot(bearer:String)(implicit materializer: ActorMaterializer) extends 
                     log.error("You auth is incorrect")
                     self ! PoisonPill
                     system.terminate
+                  case "{\"ok\":false,\"error\":\"missing_scope\",\"needed\":\"rtm:stream\",\"provided\":\"identify,bot,incoming-webhook,channels:read,team:read,channels:write,groups:write,links:read\"}" =>
+                    //some other error... i think its when you dont have the right permissions on your app side
+                    log.error("Try using Bot User OAuth Access Token")
+                    self ! PoisonPill
+                    system.terminate
                   case _ =>
                     decode[GetRTMConnection200](resp.responseBody) match {
                       case Right(body) =>
@@ -80,33 +85,46 @@ class SlackBot(bearer:String)(implicit materializer: ActorMaterializer) extends 
 
   def connecting(url:String): Receive = {
     case Connect =>
-      val req: WebSocketRequest = WebSocketRequest(uri = url)
-      val webSocketFlow: Flow[Message, Message, Future[WebSocketUpgradeResponse]] = Http().webSocketClientFlow(req)
-      val messageSource: Source[Message, ActorRef] =
-        Source.actorRef[TextMessage.Strict](bufferSize = 10, OverflowStrategy.fail)
-      val messageSink: Sink[Message, Future[Done]] = {
-        Sink.foreach {message => self ! message}}
-      val ((ws, upgradeResponse), closed): ((ActorRef, Future[WebSocketUpgradeResponse]), Future[Done]) =
-        messageSource
-          .viaMat(webSocketFlow)(Keep.both)
-          .toMat(messageSink)(Keep.both)
-          .run()
-      closed.onComplete{_ =>
-        log.info("we have disconnected on the web socket...")
-        context.become(disconnected)
-      }
-      upgradeResponse.flatMap { upgrade =>
-        if (upgrade.response.status == StatusCodes.SwitchingProtocols) {
-          log.info("Ws connection opened")
-          context.become(connected(ws))
-          Future.successful(Done)
+
+      val ee = url
+      println()
+      // Future[Done] is the materialized value of Sink.foreach,
+      // emitted when the stream completes
+      val incoming: Sink[Message, Future[Done]] =
+        Sink.foreach[Message] {
+          case message: TextMessage.Strict =>
+            println(message.text)
         }
-        else {
-          log.error("Ws connection failed stopping program")
-          //TODO Decide if this is actually the behavior we want... its never actually happened yet... so I haven't had to worry
+
+      // send this as a message over the WebSocket
+      val outgoing = Source.single(TextMessage("hello world!"))
+
+      // flow to use (note: not re-usable!)
+      val webSocketFlow = Http().webSocketClientFlow(WebSocketRequest("ws://localhost:8080/websocket"))
+
+      // the materialized value is a tuple with
+      // upgradeResponse is a Future[WebSocketUpgradeResponse] that
+      // completes or fails when the connection succeeds or fails
+      // and closed is a Future[Done] with the stream completion from the incoming sink
+      val (upgradeResponse, closed) =
+      outgoing
+        .viaMat(webSocketFlow)(Keep.right) // keep the materialized Future[WebSocketUpgradeResponse]
+        .toMat(incoming)(Keep.both) // also keep the Future[Done]
+        .run()
+
+      // just like a regular http request we can access response status which is available via upgrade.response.status
+      // status code 101 (Switching Protocols) indicates that server support WebSockets
+      val connected = upgradeResponse.flatMap { upgrade =>
+        if (upgrade.response.status == StatusCodes.SwitchingProtocols) {
+          Future.successful(Done)
+        } else {
           throw new RuntimeException(s"Connection failed: ${upgrade.response.status}")
         }
       }
+
+      // in a real application you would not side effect here
+      connected.onComplete(println)
+      closed.foreach(_ => println("closed"))
   }
 
   def connected(webSocket:ActorRef): Receive = {

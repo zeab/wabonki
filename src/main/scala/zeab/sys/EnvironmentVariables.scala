@@ -12,6 +12,19 @@ import scala.util.{Failure, Success, Try}
   */
 trait EnvironmentVariables extends SysToolbox {
 
+  /** Looks for the value of the environment variable specified
+    *
+    * @param keyToLookFor The environment variables key to look for
+    * @param typeTag      The return type (no need to actually specify this implicit it will default to the supplied T)
+    * @return Either[Throwable, T]
+    */
+  def getEnvVar[T](keyToLookFor: String)(implicit typeTag: TypeTag[T]): Either[Throwable, T] = {
+    Try(sys.env(keyToLookFor)) match {
+      case Success(envVal) => formatValue[T](typeTag.tpe.typeSymbol.name.toString, envVal)
+      case Failure(ex) => Left(ex)
+    }
+  }
+
   /** Looks for the value of the environment variable specified and throws the error or a custom one if not found
     *
     * @param keyToLookFor The environment variables key to look for
@@ -29,19 +42,6 @@ trait EnvironmentVariables extends SysToolbox {
           case Some(customEx) => throw customEx
           case None => throw ex
         }
-    }
-  }
-
-  /** Looks for the value of the environment variable specified
-    *
-    * @param keyToLookFor The environment variables key to look for
-    * @param typeTag      The return type (no need to actually specify this implicit it will default to the supplied T)
-    * @return Either[Throwable, T]
-    */
-  def getEnvVar[T](keyToLookFor: String)(implicit typeTag: TypeTag[T]): Either[Throwable, T] = {
-    Try(sys.env(keyToLookFor)) match {
-      case Success(envVal) => formatValue[T](typeTag.tpe.typeSymbol.name.toString, envVal)
-      case Failure(ex) => Left(ex)
     }
   }
 
