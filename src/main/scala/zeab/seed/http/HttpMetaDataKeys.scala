@@ -14,8 +14,6 @@ trait HttpMetaDataKeys{
 
   val setBearerKey: String = "SetBearer"
 
-  def setBearerHeader(value:String): Map[String, String] = Map(setBearerKey -> value)
-
 }
 
 object HttpMetaDataKeys extends HttpMetaDataKeys

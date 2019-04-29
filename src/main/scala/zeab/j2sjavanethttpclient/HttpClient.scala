@@ -3,6 +3,7 @@ package zeab.j2sjavanethttpclient
 //Imports
 import zeab.seed.http.HttpSeed
 import zeab.seed.http.HttpMethods.get
+import zeab.seed.http.authorization.BearerAuthorization
 import zeab.seed.http.httpclientmessages.{HttpClientError, HttpClientResponse}
 //Java
 import java.net.{HttpURLConnection, URL}
@@ -148,7 +149,9 @@ trait HttpClient {
     }
   }
 
-  def authorization(url: String, method: String, body: String, headers: Map[String, String], metaData: Map[String, String]): Map[String, String] = Map.empty
+  //This can be overridden with any authorization and if you wish to keep bearer auth just build that function into your new authorization
+  def authorization(url: String, method: String, body: String, headers: Map[String, String], metaData: Map[String, String]): Map[String, String] =
+    BearerAuthorization.bearerAuthorization(metaData)
 
   //Format the response headers so they are easy to consume
   private def removeNullFromHeaders(openConn: HttpURLConnection): Map[String, String] = {

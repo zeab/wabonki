@@ -1,6 +1,5 @@
 
 //Imports
-import ModuleNames._
 import sbt.{Def, addCommandAlias}
 
 object CommandAlias {

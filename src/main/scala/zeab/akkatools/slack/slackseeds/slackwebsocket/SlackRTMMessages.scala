@@ -1,4 +1,4 @@
-package zeab.akkatools.slackbot.slackseeds.slackwebsocket
+package zeab.akkatools.slack.slackseeds.slackwebsocket
 
 /** Collection of WS messages to and from slack */
 object SlackRTMMessages {

@@ -62,6 +62,29 @@ trait ThreadLocalRandom {
       }
   }
 
+  /** Returns the next generated pseudorandom between Float.MaxValue and Float.MinValue from the current thread local random instance.
+    *
+    * @param max The greatest Float the return can possibly be (inclusive)
+    * @param min The least Float the return can possibly be (inclusive)
+    * @return A pseudorandom Float
+    * @note Within the java implementation of ThreadLocalRandom
+    *       The origin (min) is inclusive
+    *       The bound (max) is exclusive
+    *       Have to do a little math on the decimal point to determine how much you need to add in order to make the max value inclusive
+    *       We don't need to add 1 to the double that are valid Int's because a max of 1 min of 0 would result in a possible value of 1.1
+    */
+  def getRandomFloat(max: Float = Float.MaxValue, min: Float = 1.0F): Float =
+    max match {
+      case Float.MaxValue => getRandomDouble(max, min).toFloat
+      case max: Float =>
+        if (max.isValidInt) getRandomDouble(max, min).toFloat
+        else {
+          val decimalPlaces: Int = max.toString.split('.').lastOption.getOrElse("").length
+          val maxInclusive: Double = ("0." + List.fill(decimalPlaces)(0).mkString + "1").toDouble + max
+          getRandomDouble(maxInclusive, min).toFloat
+        }
+    }
+
   /** Returns the next generated pseudorandom Date and Time
     *
     * @param alphaDateTime  The most distant a timestamp should be for the time range
@@ -228,3 +251,4 @@ trait ThreadLocalRandom {
 }
 
 object ThreadLocalRandom extends ThreadLocalRandom
+

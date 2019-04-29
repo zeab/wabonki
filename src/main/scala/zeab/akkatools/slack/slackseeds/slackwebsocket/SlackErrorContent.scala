@@ -1,4 +1,4 @@
-package zeab.akkatools.slackbot.slackseeds.slackwebsocket
+package zeab.akkatools.slack.slackseeds.slackwebsocket
 
 case class SlackErrorContent(
                               msg: String,
